@@ -1,0 +1,48 @@
+$date
+	Mon Apr 08 00:24:54 2024
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module alu_tb $end
+$scope module uut $end
+$var wire 8 ! data1 [7:0] $end
+$var wire 8 " data2 [7:0] $end
+$var wire 3 # select [2:0] $end
+$var reg 8 $ result [7:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+bx $
+b0 #
+b0 "
+b0 !
+$end
+#1
+b0 $
+#10
+b1010101 "
+b10101010 !
+#11
+b1010101 $
+#20
+b1 #
+#22
+b11111111 $
+#30
+b10 #
+#31
+b0 $
+#40
+b11 #
+#41
+b11111111 $
+#50

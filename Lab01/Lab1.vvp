@@ -1,0 +1,89 @@
+#! /c/Source/iverilog-install/bin/vvp
+:ivl_version "12.0 (devel)" "(s20150603-1539-g2693dd32b)";
+:ivl_delay_selection "TYPICAL";
+:vpi_time_precision - 9;
+:vpi_module "C:\iverilog\lib\ivl\system.vpi";
+:vpi_module "C:\iverilog\lib\ivl\vhdl_sys.vpi";
+:vpi_module "C:\iverilog\lib\ivl\vhdl_textio.vpi";
+:vpi_module "C:\iverilog\lib\ivl\v2005_math.vpi";
+:vpi_module "C:\iverilog\lib\ivl\va_math.vpi";
+S_0000029e67c65360 .scope module, "Lab1_tb" "Lab1_tb" 2 4;
+ .timescale -9 -9;
+v0000029e67d4da40_0 .var "A", 7 0;
+v0000029e67d4dae0_0 .var "B", 7 0;
+v0000029e67d4db80_0 .net "C", 7 0, L_0000029e67d4dcc0;  1 drivers
+S_0000029e67d4d8b0 .scope module, "uut" "andUnit" 2 12, 3 1 0, S_0000029e67c65360;
+ .timescale -9 -9;
+    .port_info 0 /INPUT 8 "A";
+    .port_info 1 /INPUT 8 "B";
+    .port_info 2 /OUTPUT 8 "C";
+L_0000029e67d4dcc0 .functor AND 8, v0000029e67d4da40_0, v0000029e67d4dae0_0, C4<11111111>, C4<11111111>;
+v0000029e67d471e0_0 .net "A", 7 0, v0000029e67d4da40_0;  1 drivers
+v0000029e67c65680_0 .net "B", 7 0, v0000029e67d4dae0_0;  1 drivers
+v0000029e67c65720_0 .net "C", 7 0, L_0000029e67d4dcc0;  alias, 1 drivers
+S_0000029e67c654f0 .scope module, "logicSelector" "logicSelector" 3 29;
+ .timescale -9 -9;
+    .port_info 0 /INPUT 8 "A";
+    .port_info 1 /INPUT 8 "B";
+    .port_info 2 /INPUT 1 "S";
+    .port_info 3 /OUTPUT 8 "Z";
+o0000029e67c6c0d8 .functor BUFZ 8, C4<zzzzzzzz>; HiZ drive
+v0000029e67cb9150_0 .net "A", 7 0, o0000029e67c6c0d8;  0 drivers
+o0000029e67c6c108 .functor BUFZ 8, C4<zzzzzzzz>; HiZ drive
+v0000029e67cb91f0_0 .net "B", 7 0, o0000029e67c6c108;  0 drivers
+v0000029e67cb9790_0 .net "C", 7 0, L_0000029e67d4ee90;  1 drivers
+v0000029e67cb8b10_0 .net "D", 7 0, L_0000029e67c633c0;  1 drivers
+o0000029e67c6c2b8 .functor BUFZ 1, C4<z>; HiZ drive
+v0000029e67cb96f0_0 .net "S", 0 0, o0000029e67c6c2b8;  0 drivers
+v0000029e67cb9330_0 .net "Z", 7 0, L_0000029e67cb93d0;  1 drivers
+S_0000029e67d4c0e0 .scope module, "and_gate" "andUnit" 3 39, 3 1 0, S_0000029e67c654f0;
+ .timescale -9 -9;
+    .port_info 0 /INPUT 8 "A";
+    .port_info 1 /INPUT 8 "B";
+    .port_info 2 /OUTPUT 8 "C";
+L_0000029e67d4ee90 .functor AND 8, o0000029e67c6c0d8, o0000029e67c6c108, C4<11111111>, C4<11111111>;
+v0000029e67d4dc20_0 .net "A", 7 0, o0000029e67c6c0d8;  alias, 0 drivers
+v0000029e67d4c270_0 .net "B", 7 0, o0000029e67c6c108;  alias, 0 drivers
+v0000029e67d4c310_0 .net "C", 7 0, L_0000029e67d4ee90;  alias, 1 drivers
+S_0000029e67d469a0 .scope module, "or_gate" "orUnit" 3 40, 3 10 0, S_0000029e67c654f0;
+ .timescale -9 -9;
+    .port_info 0 /INPUT 8 "A";
+    .port_info 1 /INPUT 8 "B";
+    .port_info 2 /OUTPUT 8 "D";
+L_0000029e67c633c0 .functor OR 8, o0000029e67c6c0d8, o0000029e67c6c108, C4<00000000>, C4<00000000>;
+v0000029e67d4c3b0_0 .net "A", 7 0, o0000029e67c6c0d8;  alias, 0 drivers
+v0000029e67d46b30_0 .net "B", 7 0, o0000029e67c6c108;  alias, 0 drivers
+v0000029e67d46bd0_0 .net "D", 7 0, L_0000029e67c633c0;  alias, 1 drivers
+S_0000029e67d46c70 .scope module, "selector" "muxUnit" 3 41, 3 19 0, S_0000029e67c654f0;
+ .timescale -9 -9;
+    .port_info 0 /INPUT 8 "C";
+    .port_info 1 /INPUT 8 "D";
+    .port_info 2 /INPUT 1 "S";
+    .port_info 3 /OUTPUT 8 "Z";
+v0000029e67c63320_0 .net "C", 7 0, L_0000029e67d4ee90;  alias, 1 drivers
+v0000029e67cb8e30_0 .net "D", 7 0, L_0000029e67c633c0;  alias, 1 drivers
+v0000029e67cb9290_0 .net "S", 0 0, o0000029e67c6c2b8;  alias, 0 drivers
+v0000029e67cb9010_0 .net "Z", 7 0, L_0000029e67cb93d0;  alias, 1 drivers
+L_0000029e67cb93d0 .functor MUXZ 8, L_0000029e67d4ee90, L_0000029e67c633c0, o0000029e67c6c2b8, C4<>;
+    .scope S_0000029e67c65360;
+T_0 ;
+    %pushi/vec4 0, 0, 8;
+    %store/vec4 v0000029e67d4da40_0, 0, 8;
+    %pushi/vec4 0, 0, 8;
+    %store/vec4 v0000029e67d4dae0_0, 0, 8;
+    %delay 100, 0;
+    %pushi/vec4 255, 0, 8;
+    %store/vec4 v0000029e67d4da40_0, 0, 8;
+    %pushi/vec4 8, 0, 8;
+    %store/vec4 v0000029e67d4dae0_0, 0, 8;
+    %delay 10, 0;
+    %vpi_call 2 20 "$display", "C = %b", v0000029e67d4db80_0 {0 0 0};
+    %vpi_call 2 21 "$finish" {0 0 0};
+    %end;
+    .thread T_0;
+# The file index is used to find the file name in the following table.
+:file_names 4;
+    "N/A";
+    "<interactive>";
+    "Lab1_tb.v";
+    "./Lab1.v";
