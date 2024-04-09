@@ -9,23 +9,64 @@ module alu (data1,data2,result,select);
     begin
         case (select) //to select what to output as a mux
         3'b000: // forward
-            #1 result = data2; 
+            #1 mov mov(data2,result); 
         3'b001: begin // add - sub
             if (data2 < 0)  // or we can use (data2[7]) as the condition
-                #2 result = data1 - data2;
+                #2 sub sub(data1,data2,result);
             else
-                #2 result = data1 + data2;
+                #2 add add(data1,data2,result);
             end
 
         3'b010: // and
-            #1 result = data1 & data2;
+            #1 and and(data1,data2,result);
         3'b011: // or
-            #1 result = data1 | data2;
+            #1 or or(data1,data2,result);
         // default: 3'b1xx is reserved        
         
         endcase
     end 
+endmodule
+
+module mov (data2,result);
+    input [7:0] data2;
+    output reg [7:0] result;
+
+    assign result = data2;
 
 endmodule
 
+module add (data1,data2,result);
+    input [7:0] data1;
+    input [7:0] data2;
+    output reg [7:0] result;
 
+    assign result = data1 + data2;
+
+endmodule
+
+module sub (data1,data2,result);
+    input [7:0] data1;
+    input [7:0] data2;
+    output reg [7:0] result;
+
+    assign result = data1 - data2;
+
+endmodule
+
+module and (data1,data2,result);
+    input [7:0] data1;
+    input [7:0] data2;
+    output reg [7:0] result;
+
+    assign result = data1 & data2;
+
+endmodule
+
+module or (data1,data2,result);
+    input [7:0] data1;
+    input [7:0] data2;
+    output reg [7:0] result;
+
+    assign result = data1 | data2;
+
+endmodule
