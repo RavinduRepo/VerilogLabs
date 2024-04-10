@@ -37,7 +37,6 @@ module or_module (data1,data2,result);
 
     assign result = data1 | data2;
 
-
 endmodule
 
 module alu (data1,data2,result,select);
