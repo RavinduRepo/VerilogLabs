@@ -9,18 +9,15 @@ endmodule
 module add_module (data1,data2,result);
     input [7:0] data1;
     input [7:0] data2;
-    output [7:0] result;
-
-    assign result = data1 + data2;
-
-endmodule
-
-module sub_module (data1,data2,result);
-    input [7:0] data1;
-    input [7:0] data2;
-    output [7:0] result;
-
-    assign result = data1 - data2;
+    output reg [7:0] result;
+    
+    always @(*) 
+    begin   // add - sub
+    if (data2 < 0)  // or we can use (data2[7]) as the condition
+        result = data1 - data2;
+    else
+        result = data1 + data2;
+    end
 
 endmodule
 
@@ -51,14 +48,12 @@ module alu (data1,data2,result,select);
     // making wires to have each module's answer.
     wire [7:0] mov_result;     
     wire [7:0] add_result;
-    wire [7:0] sub_result;
     wire [7:0] and_result;
     wire [7:0] or_result;
 
     // making instences for each module with seperated output 
     mov_module u0(data2, mov_result);
     add_module u1(data1, data2, add_result);
-    sub_module u2(data1, data2, sub_result);
     and_module u3(data1, data2, and_result);
     or_module u4(data1, data2, or_result);
 
@@ -68,13 +63,8 @@ module alu (data1,data2,result,select);
         case (select) //to select what to output as a mux
         3'b000: // forward
             #1 result = mov_result; 
-        3'b001: begin // add - sub
-            if (data2 < 0)  // or we can use (data2[7]) as the condition
-                #2 result = sub_result;
-            else
-                #2 result = add_result;
-            end
-
+        3'b001: // add or sub
+            #2 result = add_result;
         3'b010: // and
             #1 result = and_result;
         3'b011: // or
