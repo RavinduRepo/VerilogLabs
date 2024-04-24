@@ -1,15 +1,18 @@
+`define REG_ADDRESS_SIZE 3
+`define REG_SIZE 8
+
 module reg_file(IN,OUT1,OUT2,INADDRESS,OUT1ADDRESS,OUT2ADDRESS, WRITE, CLK, RESET);
-    input [7:0] IN;
-    input [2:0] OUT1ADDRESS, OUT2ADDRESS, INADDRESS;
-    output [7:0] OUT1, OUT2;
+    input [`REG_SIZE-1:0] IN;
+    input [`REG_ADDRESS_SIZE-1:0] OUT1ADDRESS, OUT2ADDRESS, INADDRESS;
+    output [`REG_SIZE-1:0] OUT1, OUT2;
     input WRITE, CLK, RESET;
 
     // Internal register array
-    reg [7:0] registers[7:0];
+    reg [`REG_SIZE-1:0] registers[`REG_SIZE-1:0];
 
     // Output register (registers required since we cant assign if not registers)
-    reg [7:0] out1_reg;
-    reg [7:0] out2_reg;
+    reg [`REG_SIZE-1:0] out1_reg;
+    reg [`REG_SIZE-1:0] out2_reg;
 
     // Assign outputs to internal latches
     assign OUT1 = out1_reg;         
