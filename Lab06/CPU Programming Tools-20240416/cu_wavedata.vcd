@@ -1,0 +1,80 @@
+$date
+	Wed Apr 24 14:40:28 2024
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1s
+$end
+$scope module cu_tb $end
+$var wire 1 ! TWOS_COMP $end
+$var wire 1 " REG_WRITE $end
+$var wire 1 # ALU_SRC $end
+$var wire 3 $ ALU_OP [2:0] $end
+$var reg 8 % OPCODE [7:0] $end
+$scope module cu $end
+$var wire 8 & OPCODE [7:0] $end
+$var reg 3 ' ALU_OP [2:0] $end
+$var reg 1 # ALU_SRC $end
+$var reg 1 ( MEM_READ $end
+$var reg 1 ) MEM_TO_REG $end
+$var reg 1 * MEM_WRITE $end
+$var reg 1 + REG_DEST $end
+$var reg 1 " REG_WRITE $end
+$var reg 1 ! TWOS_COMP $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+x+
+x*
+x)
+x(
+bx '
+bx &
+bx %
+bx $
+x#
+x"
+x!
+$end
+#2
+0"
+1#
+0!
+b0 $
+b0 '
+b0 %
+b0 &
+#4
+1"
+0#
+b1 %
+b1 &
+#6
+b1 $
+b1 '
+b10 %
+b10 &
+#8
+1!
+b11 %
+b11 &
+#10
+0!
+b10 $
+b10 '
+b100 %
+b100 &
+#12
+0"
+b11 $
+b11 '
+b101 %
+b101 &
+#20

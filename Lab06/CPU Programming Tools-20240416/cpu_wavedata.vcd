@@ -1,0 +1,503 @@
+$date
+	Wed Apr 24 15:14:51 2024
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1s
+$end
+$scope module Testbench $end
+$scope module mycpu $end
+$var wire 1 ! CLK $end
+$var wire 32 " INSTRUCTION [31:0] $end
+$var wire 1 # RESET $end
+$var wire 3 $ WRITEREG [2:0] $end
+$var wire 1 % WRITEENABLE $end
+$var wire 8 & TWOS_COMP_SELECTED [7:0] $end
+$var wire 1 ' TWOS_COMP_SELECT $end
+$var wire 8 ( TWOS_COMP [7:0] $end
+$var wire 8 ) REGOUT2 [7:0] $end
+$var wire 8 * REGOUT1 [7:0] $end
+$var wire 3 + READREG2 [2:0] $end
+$var wire 3 , READREG1 [2:0] $end
+$var wire 32 - PCOUT [31:0] $end
+$var wire 8 . OPCODE [7:0] $end
+$var wire 8 / IMMIDIATE_SELECTED [7:0] $end
+$var wire 1 0 IMMIDIATE_SELECT $end
+$var wire 8 1 IMMIDIATE [7:0] $end
+$var wire 8 2 ALURESULT [7:0] $end
+$var wire 3 3 ALUOP [2:0] $end
+$scope module alu $end
+$var wire 3 4 SELECT [2:0] $end
+$var wire 8 5 OR_RESULT [7:0] $end
+$var wire 8 6 MOV_RESULT [7:0] $end
+$var wire 8 7 DATA2 [7:0] $end
+$var wire 8 8 DATA1 [7:0] $end
+$var wire 8 9 AND_RESULT [7:0] $end
+$var wire 8 : ADD_RESULT [7:0] $end
+$var reg 8 ; RESULT [7:0] $end
+$scope module add1 $end
+$var wire 8 < DATA2 [7:0] $end
+$var wire 8 = DATA1 [7:0] $end
+$var reg 8 > RESULT [7:0] $end
+$upscope $end
+$scope module and1 $end
+$var wire 8 ? RESULT [7:0] $end
+$var wire 8 @ DATA2 [7:0] $end
+$var wire 8 A DATA1 [7:0] $end
+$upscope $end
+$scope module mov1 $end
+$var wire 8 B RESULT [7:0] $end
+$var wire 8 C DATA2 [7:0] $end
+$upscope $end
+$scope module or1 $end
+$var wire 8 D RESULT [7:0] $end
+$var wire 8 E DATA2 [7:0] $end
+$var wire 8 F DATA1 [7:0] $end
+$upscope $end
+$upscope $end
+$scope module alu_immidiate_mux $end
+$var wire 1 0 SELECT $end
+$var wire 8 G DATA2 [7:0] $end
+$var wire 8 H DATA1 [7:0] $end
+$var reg 8 I RESULT [7:0] $end
+$upscope $end
+$scope module control_unit $end
+$var wire 8 J OPCODE [7:0] $end
+$var reg 3 K ALU_OP [2:0] $end
+$var reg 1 0 ALU_SRC $end
+$var reg 1 L MEM_READ $end
+$var reg 1 M MEM_TO_REG $end
+$var reg 1 N MEM_WRITE $end
+$var reg 1 O REG_DEST $end
+$var reg 1 % REG_WRITE $end
+$var reg 1 ' TWOS_COMP $end
+$upscope $end
+$scope module instruction_decoder $end
+$var wire 32 P INSTRUCTION [31:0] $end
+$var reg 8 Q IMMIDIATE [7:0] $end
+$var reg 8 R OPCODE [7:0] $end
+$var reg 3 S REGISTER_1 [2:0] $end
+$var reg 3 T REGISTER_2 [2:0] $end
+$var reg 3 U REGISTER_DEST [2:0] $end
+$upscope $end
+$scope module pc $end
+$var wire 1 ! CLK $end
+$var wire 1 # RESET $end
+$var reg 32 V RESULT [31:0] $end
+$upscope $end
+$scope module reg_file $end
+$var wire 1 ! CLK $end
+$var wire 8 W IN [7:0] $end
+$var wire 3 X INADDRESS [2:0] $end
+$var wire 3 Y OUT1ADDRESS [2:0] $end
+$var wire 8 Z OUT2 [7:0] $end
+$var wire 3 [ OUT2ADDRESS [2:0] $end
+$var wire 1 # RESET $end
+$var wire 1 % WRITE $end
+$var wire 8 \ OUT1 [7:0] $end
+$var reg 8 ] out1_reg [7:0] $end
+$var reg 8 ^ out2_reg [7:0] $end
+$upscope $end
+$scope module twos_complement_mux $end
+$var wire 8 _ DATA1 [7:0] $end
+$var wire 1 ' SELECT $end
+$var wire 8 ` DATA2 [7:0] $end
+$var reg 8 a RESULT [7:0] $end
+$upscope $end
+$scope module twoscomp $end
+$var wire 8 b DATA [7:0] $end
+$var reg 8 c RESULT [7:0] $end
+$upscope $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+bx c
+bx b
+bx a
+bx `
+bx _
+bx ^
+bx ]
+bx \
+bx [
+bx Z
+bx Y
+bx X
+bx W
+b0 V
+bx U
+bx T
+bx S
+bx R
+bx Q
+bx P
+xO
+xN
+xM
+xL
+bx K
+bx J
+bx I
+bx H
+bx G
+bx F
+bx E
+bx D
+bx C
+bx B
+bx A
+bx @
+bx ?
+bx >
+bx =
+bx <
+bx ;
+bx :
+bx 9
+bx 8
+bx 7
+bx 6
+bx 5
+bx 4
+bx 3
+bx 2
+bx 1
+x0
+bx /
+bx .
+b0 -
+bx ,
+bx +
+bx *
+bx )
+bx (
+x'
+bx &
+x%
+bx $
+1#
+bx "
+0!
+$end
+#2
+b1000000000000000101 "
+b1000000000000000101 P
+#3
+bx1x1 5
+bx1x1 D
+b0x0x 9
+b0x0x ?
+b101 6
+b101 B
+b101 /
+b101 7
+b101 <
+b101 @
+b101 C
+b101 E
+b101 I
+0%
+10
+0'
+b0 3
+b0 4
+b0 K
+b101 1
+b101 G
+b101 Q
+b100 $
+b100 U
+b100 X
+b101 +
+b101 T
+b101 [
+b0 ,
+b0 S
+b0 Y
+b0 .
+b0 J
+b0 R
+#4
+b101 2
+b101 ;
+b101 W
+1!
+#6
+0#
+#8
+0!
+#12
+1!
+#13
+b100 -
+b100 V
+#14
+b0 &
+b0 H
+b0 a
+b101 5
+b101 D
+b0 9
+b0 ?
+b101 :
+b101 >
+b0 )
+b0 Z
+b0 _
+b0 b
+b0 ^
+b0 *
+b0 8
+b0 =
+b0 A
+b0 F
+b0 \
+b0 ]
+#15
+b0 (
+b0 `
+b0 c
+b100000000000001001 "
+b100000000000001001 P
+#16
+b1001 5
+b1001 D
+b1001 :
+b1001 >
+b1001 6
+b1001 B
+b1001 /
+b1001 7
+b1001 <
+b1001 @
+b1001 C
+b1001 E
+b1001 I
+b1001 1
+b1001 G
+b1001 Q
+b10 $
+b10 U
+b10 X
+b1 +
+b1 T
+b1 [
+0!
+#17
+b1001 2
+b1001 ;
+b1001 W
+#20
+1!
+#21
+b1000 -
+b1000 V
+#23
+b10000001100000010000000010 "
+b10000001100000010000000010 P
+#24
+b0 5
+b0 D
+b0 :
+b0 >
+b0 6
+b0 B
+b0 /
+b0 7
+b0 <
+b0 @
+b0 C
+b0 E
+b0 I
+1%
+00
+b1 3
+b1 4
+b1 K
+b10 1
+b10 G
+b10 Q
+b110 $
+b110 U
+b110 X
+b10 +
+b10 T
+b10 [
+b100 ,
+b100 S
+b100 Y
+b10 .
+b10 J
+b10 R
+0!
+#26
+b0 2
+b0 ;
+b0 W
+#28
+1!
+#29
+b1100 -
+b1100 V
+#31
+b1000000000000000000000110 "
+b1000000000000000000000110 P
+#32
+b0 3
+b0 4
+b0 K
+b110 1
+b110 G
+b110 Q
+b0 $
+b0 U
+b0 X
+b110 +
+b110 T
+b110 [
+b0 ,
+b0 S
+b0 Y
+b1 .
+b1 J
+b1 R
+0!
+#36
+1!
+#37
+b10000 -
+b10000 V
+#39
+b10000000000000001 "
+b10000000000000001 P
+#40
+b1 5
+b1 D
+b1 :
+b1 >
+b1 6
+b1 B
+b1 /
+b1 7
+b1 <
+b1 @
+b1 C
+b1 E
+b1 I
+0%
+10
+b1 1
+b1 G
+b1 Q
+b1 $
+b1 U
+b1 X
+b1 +
+b1 T
+b1 [
+b0 .
+b0 J
+b0 R
+0!
+#41
+b1 2
+b1 ;
+b1 W
+#44
+1!
+#45
+b10100 -
+b10100 V
+#47
+b10000000100000001000000001 "
+b10000000100000001000000001 P
+#48
+b0 5
+b0 D
+b0 :
+b0 >
+b0 6
+b0 B
+b0 /
+b0 7
+b0 <
+b0 @
+b0 C
+b0 E
+b0 I
+1%
+00
+b1 3
+b1 4
+b1 K
+b10 $
+b10 U
+b10 X
+b10 ,
+b10 S
+b10 Y
+b10 .
+b10 J
+b10 R
+0!
+#50
+b0 2
+b0 ;
+b0 W
+#52
+1!
+#53
+b11000 -
+b11000 V
+#56
+0!
+#60
+1!
+#61
+b11100 -
+b11100 V
+#64
+0!
+#68
+1!
+#69
+b100000 -
+b100000 V
+#72
+0!
+#76
+1!
+#77
+b100100 -
+b100100 V
+#80
+0!
+#84
+1!
+#85
+b101000 -
+b101000 V
+#88
+0!
+#92
+1!
+#93
+b101100 -
+b101100 V
+#96
+0!
+#100
+1!
+#101
+b110000 -
+b110000 V
+#104
+0!
+#106

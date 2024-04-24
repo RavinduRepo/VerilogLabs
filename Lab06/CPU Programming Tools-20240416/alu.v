@@ -1,4 +1,6 @@
 `define REG_SIZE 8
+`define REG_ADDRESS_SIZE 3
+
 
 module mov_module (DATA2,RESULT);
     input [`REG_SIZE-1:0] DATA2;
@@ -42,11 +44,11 @@ module or_module (DATA1,DATA2,RESULT);
 
 endmodule
 
-module alu (DATA1,DATA2,RESULT,select);
+module alu (DATA1,DATA2,RESULT,SELECT);
     input [`REG_SIZE-1:0] DATA1;
     input [`REG_SIZE-1:0] DATA2;
     output reg [`REG_SIZE-1:0] RESULT; // if we want to use wire insted of reg , we woud have to use 'assign' to do that use internal_RESULT and assign to RESULT at the end
-    input [`REG_SIZE-1:0] select;
+    input [`REG_ADDRESS_SIZE-1:0] SELECT;
 
     // making wires to have each module's answer.
     wire [`REG_SIZE-1:0] MOV_RESULT;     
@@ -55,15 +57,15 @@ module alu (DATA1,DATA2,RESULT,select);
     wire [`REG_SIZE-1:0] OR_RESULT;
 
     // making instences for each module with seperated output 
-    mov_module u0(DATA2, MOV_RESULT);
-    add_module u1(DATA1, DATA2, ADD_RESULT);
-    and_module u3(DATA1, DATA2, AND_RESULT);
-    or_module u4(DATA1, DATA2, OR_RESULT);
+    mov_module mov1(DATA2, MOV_RESULT);
+    add_module add1(DATA1, DATA2, ADD_RESULT);
+    and_module and1(DATA1, DATA2, AND_RESULT);
+    or_module or1(DATA1, DATA2, OR_RESULT);
 
     // always block * to run the block whenever any input changes  
     always @(*)
     begin
-        case (select) //to select what to output as a mux
+        case (SELECT) //to SELECT what to output as a mux
         3'b000: // forward
             #1 RESULT = MOV_RESULT; 
         3'b001: // add or sub
