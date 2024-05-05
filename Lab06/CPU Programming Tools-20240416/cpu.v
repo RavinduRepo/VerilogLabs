@@ -180,13 +180,13 @@ module cpu(PCOUT, INSTRUCTION, CLK, RESET);
     wire [`REG_SIZE-1:0] ALURESULT;
 
     programme_counter pc(PCOUT,RESET,CLK); // The programme counter
-    instruction_decoder instruction_decoder(INSTRUCTION,OPCODE,READREG1,READREG2,WRITEREG,IMMIDIATE);
-    control_unit control_unit(OPCODE,ALUOP,IMMIDIATE_SELECT,WRITEENABLE,TWOS_COMP_SELECT);
+    instruction_decoder instruction_decoder(INSTRUCTION,OPCODE,READREG1,READREG2,WRITEREG,IMMIDIATE);   // The instruction decorder
+    control_unit control_unit(OPCODE,ALUOP,IMMIDIATE_SELECT,WRITEENABLE,TWOS_COMP_SELECT);  //Control unit
 
-    reg_file reg_file(ALURESULT,REGOUT1,REGOUT2,WRITEREG,READREG1,READREG2,WRITEENABLE,CLK,RESET);
-    twos_complement twoscomp(REGOUT2,TWOS_COMP);
-    mux_module twos_complement_mux(REGOUT2,TWOS_COMP,TWOS_COMP_SELECTED,TWOS_COMP_SELECT);
-    mux_module alu_immidiate_mux(TWOS_COMP_SELECTED,IMMIDIATE,IMMIDIATE_SELECTED,IMMIDIATE_SELECT);
-    alu alu(REGOUT1,IMMIDIATE_SELECTED,ALURESULT,ALUOP);
+    reg_file reg_file(ALURESULT,REGOUT1,REGOUT2,WRITEREG,READREG1,READREG2,WRITEENABLE,CLK,RESET);  // Register file
+    twos_complement twoscomp(REGOUT2,TWOS_COMP);    // Twos complement 
+    mux_module twos_complement_mux(REGOUT2,TWOS_COMP,TWOS_COMP_SELECTED,TWOS_COMP_SELECT);      // mux to select the two's complement
+    mux_module alu_immidiate_mux(TWOS_COMP_SELECTED,IMMIDIATE,IMMIDIATE_SELECTED,IMMIDIATE_SELECT);     // Mux to select the immidate value from the instruction
+    alu alu(REGOUT1,IMMIDIATE_SELECTED,ALURESULT,ALUOP);    // The ALU 
 
 endmodule
