@@ -1,5 +1,5 @@
-`define REG_ADDRESS_SIZE 3
-`define REG_SIZE 8
+`define REG_ADDRESS_SIZE 3 // Size of a register address
+`define REG_SIZE 8 // size of a register
 
 module reg_file(IN,OUT1,OUT2,INADDRESS,OUT1ADDRESS,OUT2ADDRESS, WRITE, CLK, RESET);
     input [`REG_SIZE-1:0] IN;
@@ -10,16 +10,13 @@ module reg_file(IN,OUT1,OUT2,INADDRESS,OUT1ADDRESS,OUT2ADDRESS, WRITE, CLK, RESE
     // Internal register array
     reg [`REG_SIZE-1:0] registers[`REG_SIZE-1:0];
 
-    // Output register (registers required since we cant assign if not registers)
-    reg [`REG_SIZE-1:0] out1_reg;
-    reg [`REG_SIZE-1:0] out2_reg;
-
     // Assign outputs to internal latches
-    assign OUT1 = out1_reg;         
-    assign OUT2 = out2_reg;
+    assign #2 OUT1 = registers[OUT1ADDRESS];         
+    assign #2 OUT2 = registers[OUT2ADDRESS];
     
     always @(posedge CLK)
     begin
+
         if (RESET) // If reset is high
         begin
             // Reset all registers to 0 with time delay of #1
@@ -36,12 +33,6 @@ module reg_file(IN,OUT1,OUT2,INADDRESS,OUT1ADDRESS,OUT2ADDRESS, WRITE, CLK, RESE
         else if (WRITE) // If write is high
         begin
             registers[INADDRESS] <= #1 IN; // #1 propergation delay
-        end
-        
-        else  // Else times output should be what ever address the pointers are pointing at
-        begin   // Outputting values with #2 delay 
-            out1_reg <= #2 registers[OUT1ADDRESS];      //here registers are reqired , since wirescant be used to store values
-            out2_reg <= #2 registers[OUT2ADDRESS];
         end
 
     end
