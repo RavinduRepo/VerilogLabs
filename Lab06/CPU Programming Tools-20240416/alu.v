@@ -44,11 +44,12 @@ module or_module (DATA1,DATA2,RESULT);
 
 endmodule
 
-module alu (DATA1,DATA2,RESULT,SELECT);
+module alu (DATA1,DATA2,RESULT,SELECT,ZERO);
     input [`REG_SIZE-1:0] DATA1;
     input [`REG_SIZE-1:0] DATA2;
     output reg [`REG_SIZE-1:0] RESULT; // if we want to use wire insted of reg , we woud have to use 'assign' to do that use internal_RESULT and assign to RESULT at the end
     input [`REG_ADDRESS_SIZE-1:0] SELECT;
+    output reg ZERO;
 
     // making wires to have each module's answer.
     wire [`REG_SIZE-1:0] MOV_RESULT;     
@@ -61,6 +62,16 @@ module alu (DATA1,DATA2,RESULT,SELECT);
     add_module add1(DATA1, DATA2, ADD_RESULT);
     and_module and1(DATA1, DATA2, AND_RESULT);
     or_module or1(DATA1, DATA2, OR_RESULT);
+
+    // to check of result is zero for the branch if equal command
+    always @(RESULT) begin
+        if (RESULT == 0) begin
+            ZERO = 1;
+        end
+        else begin
+            ZERO = 0;
+        end
+    end
 
     // always block * to run the block whenever any input changes  
     always @(*)
