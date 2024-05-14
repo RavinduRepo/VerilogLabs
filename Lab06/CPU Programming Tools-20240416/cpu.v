@@ -21,6 +21,7 @@
 `define FUNC_END 0
 `define IMMIDIATE_END 0
 `define ADDRESS_END 0
+`define BRANCH_END 16
 `define JUMP_END 16
 
 `define ALU_OP_SIZE 3
@@ -65,21 +66,22 @@ module twos_complement(DATA,RESULT);
 endmodule
 
 // Programme counter module
-module programme_counter(RESULT,NEXTRESULT,RESET,CLK);
-    output reg [31:0] RESULT; 
-    output reg [31:0] NEXTRESULT; 
+module programme_counter(PCOUT,NEXTPCOUT,RESET,CLK,SELECTEDOUTPUT);
+    output reg [31:0] PCOUT; 
+    output reg [31:0] NEXTPCOUT; 
+    input [31:0] SELECTEDOUTPUT;
     input RESET;
     input CLK;
 
     always @(posedge CLK) begin
         if (RESET) begin // Sets to zero of resset is  high
-            RESULT <= #1 32'd0;
-            NEXTRESULT <= #2 32'd4;
+            PCOUT <= #1 32'b0000_0000_0000_0000_0000_0000;
+            NEXTPCOUT <= #2 32'b0000_0000_0000_0000_0000_0100;
         end
 
         else begin // incrementing
-            RESULT <= #1 NEXTRESULT;
-            NEXTRESULT <= #2 NEXTRESULT + 32'd4;
+            PCOUT <= #1 SELECTEDOUTPUT;
+            NEXTPCOUT <= #2 SELECTEDOUTPUT + 32'd4;
         end
     end
     
@@ -87,12 +89,13 @@ endmodule
 
 
 // Module for decoding instructions
-module instruction_decoder(INSTRUCTION,OPCODE,REGISTER_1,REGISTER_2,REGISTER_DEST,IMMIDIATE,JUMPADDRESS);
+module instruction_decoder(INSTRUCTION,OPCODE,REGISTER_1,REGISTER_2,REGISTER_DEST,IMMIDIATE,BRANCHADDRESS,JUMPADDRESS);
     input [31:0] INSTRUCTION;
     output reg [`OPCODE_SIZE-1:0] OPCODE;
     output reg [`REG_ADDRESS_SIZE-1:0] REGISTER_1,REGISTER_2,REGISTER_DEST;
     output reg [`IMMIDIATE_SIZE-1:0] IMMIDIATE;
     output reg [`JUMP_SIZE-1:0] JUMPADDRESS;
+    output reg [`IMMIDIATE_SIZE-1:0] BRANCHADDRESS;
 
     always @(INSTRUCTION) begin
         OPCODE = INSTRUCTION[`OPCODE_END + `OPCODE_SIZE : `OPCODE_END]; 
@@ -100,6 +103,7 @@ module instruction_decoder(INSTRUCTION,OPCODE,REGISTER_1,REGISTER_2,REGISTER_DES
         REGISTER_2 = INSTRUCTION[`REGISTER_2_END + `REG_SIZE : `REGISTER_2_END];
         REGISTER_DEST = INSTRUCTION[`REGISTER_DEST_END + `REG_SIZE : `REGISTER_DEST_END];
         IMMIDIATE = INSTRUCTION[`IMMIDIATE_END + `IMMIDIATE_SIZE : `IMMIDIATE_END];
+        BRANCHADDRESS = INSTRUCTION[`BRANCH_END + `IMMIDIATE_SIZE : `BRANCH_END];
         JUMPADDRESS = INSTRUCTION[`JUMP_END + `JUMP_SIZE : `JUMP_END];
     end
 
@@ -111,7 +115,12 @@ module sign_extender(INPUT,OUTPUT);
     output reg [31:0] OUTPUT;
 
     always @(INPUT) begin
-        OUTPUT [31:`JUMP_SIZE] = 24'b0000_0000_0000_0000_0000_0000;
+        if (INPUT[7]) begin
+            OUTPUT [31:`JUMP_SIZE] = 24'b1111_1111_1111_1111_1111_1111;
+        end
+        else begin
+            OUTPUT [31:`JUMP_SIZE] = 24'b0000_0000_0000_0000_0000_0000;
+        end
         OUTPUT [`JUMP_SIZE-1:0] = INPUT;
     end
 
@@ -124,7 +133,7 @@ module left_shift(INPUT,OUTPUT);
 
     always @(INPUT) begin
         OUTPUT[31:2] = INPUT[29:0];
-        OUTPUT[2:0] = 2'b00;
+        OUTPUT[1:0] = 2'b00;
     end
 
 endmodule
@@ -136,8 +145,7 @@ module jump_concatenate(PCOUT,LEFTSHIFTEDJUMP,JUMPADDRESS);
     output reg [31:0] JUMPADDRESS;
 
     always @(PCOUT,LEFTSHIFTEDJUMP) begin
-        JUMPADDRESS[31:28] = PCOUT[31:28];
-        JUMPADDRESS[27:0] = LEFTSHIFTEDJUMP[27:0];
+        JUMPADDRESS = PCOUT + LEFTSHIFTEDJUMP;
     end
 
 endmodule
@@ -240,12 +248,21 @@ module control_unit(OPCODE,ALU_OP,ALU_SRC,REG_WRITE,TWOS_COMP,BRANCH_SELECT,JUMP
         8'b00000111: // beq
         begin
             ALU_OP = 3'b000; //ALUOP COMMAND
-            TWOS_COMP = 1'b0;
+            TWOS_COMP = 1'b1;
             ALU_SRC = 1'b0;
             REG_WRITE = 1'b0; 
             BRANCH_SELECT = 1'b1;
             JUMP_SELECT = 1'b0;  
         end 
+        default:
+        begin
+            ALU_OP = 3'b000; //ALUOP COMMAND
+            TWOS_COMP = 1'b0;
+            ALU_SRC = 1'b0;
+            REG_WRITE = 1'b0; 
+            BRANCH_SELECT = 1'b0;
+            JUMP_SELECT = 1'b0; 
+        end
         endcase
     end 
 
@@ -270,6 +287,8 @@ module cpu(PCOUT, INSTRUCTION, CLK, RESET);
     wire [`REG_ADDRESS_SIZE-1:0] WRITEREG;
     wire [`OPCODE_SIZE-1:0] OPCODE;
     wire [`JUMP_SIZE-1:0] JUMPINSTRUCTION;
+    wire [`JUMP_SIZE-1:0] BRANCHINSTRUCTION;
+
 
     //sign_extender
     wire [31:0] SIGNEXTENDEDJUMP;
@@ -307,20 +326,20 @@ module cpu(PCOUT, INSTRUCTION, CLK, RESET);
     wire [`REG_SIZE-1:0] TWOS_COMP_SELECTED;
     wire [`REG_SIZE-1:0] IMMIDIATE_SELECTED;
     wire [31:0] BRANCH_SELECTED;
-    wire [31:0] JUMP_SELECTED;
+    output wire [31:0] JUMP_SELECTED;
 
     //alu
     wire [`REG_SIZE-1:0] ALURESULT;
     wire ZERO;
 
-    programme_counter pc(PCOUT,NEXTPCOUT,RESET,CLK); // The programme counter
-    instruction_decoder instruction_decoder(INSTRUCTION,OPCODE,READREG1,READREG2,WRITEREG,IMMIDIATE,JUMPINSTRUCTION);   // The instruction decorder
+    programme_counter pc(PCOUT,NEXTPCOUT,RESET,CLK,JUMP_SELECTED); // The programme counter
+    instruction_decoder instruction_decoder(INSTRUCTION,OPCODE,READREG1,READREG2,WRITEREG,IMMIDIATE,BRANCHINSTRUCTION,JUMPINSTRUCTION);   // The instruction decorder
     
     sign_extender sign_extender_for_jump(JUMPINSTRUCTION,SIGNEXTENDEDJUMP);     // sign extend for jump instruction
     left_shift left_shift_for_jump(SIGNEXTENDEDJUMP,LEFTSHIFTEDJUMP);   // left shift for jump instruction 
     jump_concatenate jump_concatenate(NEXTPCOUT,LEFTSHIFTEDJUMP,JUMPADDRESS);   // jump concatenator
 
-    sign_extender sign_extender_for_branch(IMMIDIATE,SIGNEXTENDEDBRANCH);   // sign extended for branch imidiate value
+    sign_extender sign_extender_for_branch(BRANCHINSTRUCTION,SIGNEXTENDEDBRANCH);   // sign extended for branch imidiate value
     left_shift left_shift_for_branch(SIGNEXTENDEDBRANCH,LEFTSHIFTEDBRANCH); // left shift for branch iimidiate value
     branch_add branch_add(NEXTPCOUT,LEFTSHIFTEDBRANCH,BRANCHADDRESS);    // adding address to PC+4 for branch instruction
 
@@ -333,10 +352,11 @@ module cpu(PCOUT, INSTRUCTION, CLK, RESET);
     mux_module8 alu_immidiate_mux(TWOS_COMP_SELECTED,IMMIDIATE,IMMIDIATE_SELECTED,IMMIDIATE_SELECT);     // Mux to select the immidate value from the instruction
     
     branch_and branch_and(BRANCH_SELECT,ZERO,ZERO_and_BRANCHSELECT);    // and gate for if_Zero and Branch control signal
-    mux_module32 branch_select_mux(PCOUT,BRANCHADDRESS,BRANCH_SELECTED,ZERO_and_BRANCHSELECT); // selcting mux whether to branch or not
+    mux_module32 branch_select_mux(NEXTPCOUT,BRANCHADDRESS,BRANCH_SELECTED,ZERO_and_BRANCHSELECT); // selcting mux whether to branch or not
 
     mux_module32 jump_select_mux(BRANCH_SELECTED,JUMPADDRESS,JUMP_SELECTED,JUMP_SELECT); // selcting mux whether to branch or not
 
     alu alu(REGOUT1,IMMIDIATE_SELECTED,ALURESULT,ALUOP,ZERO);    // The ALU 
+    // assign NEXTPCOUT = JUMP_SELECTED;
 
 endmodule

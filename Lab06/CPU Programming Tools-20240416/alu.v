@@ -64,8 +64,8 @@ module alu (DATA1,DATA2,RESULT,SELECT,ZERO);
     or_module or1(DATA1, DATA2, OR_RESULT);
 
     // to check of result is zero for the branch if equal command
-    always @(RESULT) begin
-        if (RESULT == 0) begin
+    always @(*) begin
+        if (!ADD_RESULT) begin
             ZERO = 1;
         end
         else begin
