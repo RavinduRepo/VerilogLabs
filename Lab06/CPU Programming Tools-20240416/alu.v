@@ -41,8 +41,39 @@ module or_module (DATA1,DATA2,RESULT);
 
     assign RESULT = DATA1 | DATA2;
 
+endmodule
+
+module mult_module (DATA1,DATA2,RESULT);
+    input [`REG_SIZE-1:0] DATA1;
+    input [`REG_SIZE-1:0] DATA2;
+    output [`REG_SIZE-1:0] RESULT;
+
+    assign RESULT = DATA1 * DATA2;
 
 endmodule
+
+module logical_shift (DATA, SHIFTAMOUNT, RESULT);
+    input [`REG_SIZE-1:0] DATA;
+    input [`REG_SIZE-1:0] SHIFTAMOUNT;
+    output reg [`REG_SIZE-1:0] RESULT;
+
+    integer i;
+    always @(*) begin
+        if (!SHIFTAMOUNT[`REG_SIZE-1]) begin // left shift
+            RESULT = DATA;
+            for (i = 0; i < SHIFTAMOUNT; i = i + 1) begin
+                RESULT = RESULT * 2;
+            end
+        end
+        else if (SHIFTAMOUNT[`REG_SIZE-1]) begin // right shift
+            RESULT = DATA;
+            for (i = -0; i < SHIFTAMOUNT; i = i - 1) begin
+                RESULT = RESULT / 2;
+            end
+        end
+    end
+endmodule
+
 
 module alu (DATA1,DATA2,RESULT,SELECT,ZERO);
     input [`REG_SIZE-1:0] DATA1;
@@ -56,12 +87,18 @@ module alu (DATA1,DATA2,RESULT,SELECT,ZERO);
     wire [`REG_SIZE-1:0] ADD_RESULT;
     wire [`REG_SIZE-1:0] AND_RESULT;
     wire [`REG_SIZE-1:0] OR_RESULT;
+    wire [`REG_SIZE-1:0] MULT_RESULT;
+    wire [`REG_SIZE-1:0] SL_RESULT; // shift locically (left or right)
+
 
     // making instences for each module with seperated output 
     mov_module mov1(DATA2, MOV_RESULT);
     add_module add1(DATA1, DATA2, ADD_RESULT);
     and_module and1(DATA1, DATA2, AND_RESULT);
     or_module or1(DATA1, DATA2, OR_RESULT);
+    mult_module mult1(DATA1, DATA2, MULT_RESULT);
+    logical_shift sl1(DATA1, DATA2, SL_RESULT);
+
 
     // to check of result is zero for the branch if equal command
     always @(*) begin
@@ -85,6 +122,10 @@ module alu (DATA1,DATA2,RESULT,SELECT,ZERO);
             #1 RESULT = AND_RESULT;
         3'b011: // or
             #1 RESULT = OR_RESULT;
+        3'b100: // mult
+            #2 RESULT = MULT_RESULT;
+        3'b101: // sll
+            #2 RESULT = SL_RESULT;
         //default: 3'b1xx is reserved        
         
         endcase

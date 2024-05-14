@@ -172,9 +172,9 @@ module branch_add(PCOUT,LEFTSHIFTEDBRANCH,BRANCHADDRESS);
 endmodule
 
 // add, sub, and, or, mov, loadi
-module control_unit(OPCODE,ALU_OP,ALU_SRC,REG_WRITE,TWOS_COMP,BRANCH_SELECT,JUMP_SELECT);
+module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SELECT,JUMP_SELECT);
     input [`OPCODE_SIZE-1:0] OPCODE;
-    output reg ALU_SRC,REG_WRITE,TWOS_COMP,BRANCH_SELECT,JUMP_SELECT;
+    output reg IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SELECT,JUMP_SELECT;
     output reg [`ALU_OP_SIZE-1:0] ALU_OP;
 
     // always block * to run the block whenever any input changes  
@@ -186,7 +186,7 @@ module control_unit(OPCODE,ALU_OP,ALU_SRC,REG_WRITE,TWOS_COMP,BRANCH_SELECT,JUMP
         begin
             ALU_OP = 3'b000; //ALUOP COMMAND
             TWOS_COMP = 1'b0;
-            ALU_SRC = 1'b1;
+            IMMIDIATE_SELECT = 1'b1;
             REG_WRITE = 1'b1;
             BRANCH_SELECT = 1'b0;
             JUMP_SELECT = 1'b0;
@@ -195,7 +195,7 @@ module control_unit(OPCODE,ALU_OP,ALU_SRC,REG_WRITE,TWOS_COMP,BRANCH_SELECT,JUMP
         begin
             ALU_OP = 3'b000; //ALUOP COMMAND
             TWOS_COMP = 1'b0;
-            ALU_SRC = 1'b0;
+            IMMIDIATE_SELECT = 1'b0;
             REG_WRITE = 1'b1;
             BRANCH_SELECT = 1'b0;
             JUMP_SELECT = 1'b0;     
@@ -204,7 +204,7 @@ module control_unit(OPCODE,ALU_OP,ALU_SRC,REG_WRITE,TWOS_COMP,BRANCH_SELECT,JUMP
         begin
             ALU_OP = 3'b001; //ALUOP COMMAND
             TWOS_COMP = 1'b0;
-            ALU_SRC = 1'b0;
+            IMMIDIATE_SELECT = 1'b0;
             REG_WRITE = 1'b1;
             BRANCH_SELECT = 1'b0;
             JUMP_SELECT = 1'b0;   
@@ -213,7 +213,7 @@ module control_unit(OPCODE,ALU_OP,ALU_SRC,REG_WRITE,TWOS_COMP,BRANCH_SELECT,JUMP
         begin
             ALU_OP = 3'b001; //ALUOP COMMAND
             TWOS_COMP = 1'b1;
-            ALU_SRC = 1'b0;
+            IMMIDIATE_SELECT = 1'b0;
             REG_WRITE = 1'b1;
             BRANCH_SELECT = 1'b0;
             JUMP_SELECT = 1'b0;  
@@ -222,7 +222,7 @@ module control_unit(OPCODE,ALU_OP,ALU_SRC,REG_WRITE,TWOS_COMP,BRANCH_SELECT,JUMP
         begin
             ALU_OP = 3'b010; //ALUOP COMMAND
             TWOS_COMP = 1'b0;
-            ALU_SRC = 1'b0;
+            IMMIDIATE_SELECT = 1'b0;
             REG_WRITE = 1'b1;
             BRANCH_SELECT = 1'b0;
             JUMP_SELECT = 1'b0; 
@@ -231,7 +231,7 @@ module control_unit(OPCODE,ALU_OP,ALU_SRC,REG_WRITE,TWOS_COMP,BRANCH_SELECT,JUMP
         begin
             ALU_OP = 3'b011; //ALUOP COMMAND
             TWOS_COMP = 1'b0;
-            ALU_SRC = 1'b0;
+            IMMIDIATE_SELECT = 1'b0;
             REG_WRITE = 1'b1; 
             BRANCH_SELECT = 1'b0;
             JUMP_SELECT = 1'b0;  
@@ -240,7 +240,7 @@ module control_unit(OPCODE,ALU_OP,ALU_SRC,REG_WRITE,TWOS_COMP,BRANCH_SELECT,JUMP
         begin
             ALU_OP = 3'b000; //ALUOP COMMAND
             TWOS_COMP = 1'b0;
-            ALU_SRC = 1'b0;
+            IMMIDIATE_SELECT = 1'b0;
             REG_WRITE = 1'b0; 
             BRANCH_SELECT = 1'b0;
             JUMP_SELECT = 1'b1;  
@@ -249,16 +249,34 @@ module control_unit(OPCODE,ALU_OP,ALU_SRC,REG_WRITE,TWOS_COMP,BRANCH_SELECT,JUMP
         begin
             ALU_OP = 3'b000; //ALUOP COMMAND
             TWOS_COMP = 1'b1;
-            ALU_SRC = 1'b0;
+            IMMIDIATE_SELECT = 1'b0;
             REG_WRITE = 1'b0; 
             BRANCH_SELECT = 1'b1;
             JUMP_SELECT = 1'b0;  
         end 
+        8'b00001000: // mult
+        begin
+            ALU_OP = 3'b100; //ALUOP COMMAND
+            TWOS_COMP = 1'b0;
+            IMMIDIATE_SELECT = 1'b0;
+            REG_WRITE = 1'b1; 
+            BRANCH_SELECT = 1'b0;
+            JUMP_SELECT = 1'b0;  
+        end
+        8'b00001001: // mult
+        begin
+            ALU_OP = 3'b101; //ALUOP COMMAND
+            TWOS_COMP = 1'b0;
+            IMMIDIATE_SELECT = 1'b1;
+            REG_WRITE = 1'b1; 
+            BRANCH_SELECT = 1'b0;
+            JUMP_SELECT = 1'b0;  
+        end
         default:
         begin
             ALU_OP = 3'b000; //ALUOP COMMAND
             TWOS_COMP = 1'b0;
-            ALU_SRC = 1'b0;
+            IMMIDIATE_SELECT = 1'b0;
             REG_WRITE = 1'b0; 
             BRANCH_SELECT = 1'b0;
             JUMP_SELECT = 1'b0; 
