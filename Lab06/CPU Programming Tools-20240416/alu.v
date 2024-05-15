@@ -59,6 +59,40 @@ module logical_shift (DATA, SHIFTAMOUNT, RESULT);
     output reg [`REG_SIZE-1:0] RESULT;
 
     integer i;
+    integer j;
+    always @(*) begin
+        RESULT = DATA;
+        OFFSET = SHIFTAMOUNT;
+        if (!SHIFTAMOUNT[`REG_SIZE-1]) begin // left shift
+            for (i = 0; i < OFFSET; i = i + 1) begin
+                for (j = 0; j < `REG_SIZE; j = j + 1) begin
+                    RESULT[j] = RESULT[j - 1];
+                    if (j == 0) begin
+                    RESULT[j] = 1'b0;   
+                    end
+                end
+            end
+        end
+        else if (SHIFTAMOUNT[`REG_SIZE-1]) begin // right shift
+            OFFSET = -SHIFTAMOUNT;
+            for (i = 0; i < OFFSET; i = i + 1) begin
+                for (j = 0; j < `REG_SIZE; j = j + 1) begin
+                    RESULT[j] = RESULT[j + 1];
+                    if (j == `REG_SIZE-1) begin
+                    RESULT[j] = 1'b0;   
+                    end
+                end          
+            end
+        end
+    end
+endmodule
+
+module arithmatic_shift (DATA, SHIFTAMOUNT, RESULT);
+    input [`REG_SIZE-1:0] DATA;
+    input [`REG_SIZE-1:0] SHIFTAMOUNT;
+    reg [`REG_SIZE-1:0] OFFSET;
+    output reg [`REG_SIZE-1:0] RESULT;
+    integer i;
     always @(*) begin
         RESULT = DATA;
             OFFSET = SHIFTAMOUNT;
@@ -74,6 +108,8 @@ module logical_shift (DATA, SHIFTAMOUNT, RESULT);
             end
         end
     end
+
+
 endmodule
 
 
