@@ -55,19 +55,21 @@ endmodule
 module logical_shift (DATA, SHIFTAMOUNT, RESULT);
     input [`REG_SIZE-1:0] DATA;
     input [`REG_SIZE-1:0] SHIFTAMOUNT;
+    reg [`REG_SIZE-1:0] OFFSET;
     output reg [`REG_SIZE-1:0] RESULT;
 
     integer i;
     always @(*) begin
+        RESULT = DATA;
+            OFFSET = SHIFTAMOUNT;
         if (!SHIFTAMOUNT[`REG_SIZE-1]) begin // left shift
-            RESULT = DATA;
-            for (i = 0; i < SHIFTAMOUNT; i = i + 1) begin
+            for (i = 0; i < OFFSET; i = i + 1) begin
                 RESULT = RESULT * 2;
             end
         end
         else if (SHIFTAMOUNT[`REG_SIZE-1]) begin // right shift
-            RESULT = DATA;
-            for (i = -0; i < SHIFTAMOUNT; i = i - 1) begin
+            OFFSET = -SHIFTAMOUNT;
+            for (i = 0; i < OFFSET; i = i + 1) begin
                 RESULT = RESULT / 2;
             end
         end

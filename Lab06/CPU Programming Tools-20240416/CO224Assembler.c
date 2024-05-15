@@ -53,6 +53,8 @@ int main( int argc, char *argv[] )
 	char *op_beq	= "00000111";
 	char *op_mult 	= "00001000";
 	char *op_sll 	= "00001001"; // logical left shift
+	char *op_srl 	= "00001011"; // logical right shift
+
 
 
 	// char *op_lwd 	= "00001000";
@@ -156,6 +158,8 @@ int main( int argc, char *argv[] )
 			else if(strcasecmp(in_token,"beq")==0) strcpy(out_token, op_beq);
 			else if(strcasecmp(in_token,"mult")==0) strcpy(out_token, op_mult);
 			else if(strcasecmp(in_token,"sll")==0) strcpy(out_token, op_sll);
+			else if(strcasecmp(in_token,"srl")==0) strcpy(out_token, op_srl);
+
 
 
 			// else if(strcasecmp(in_token,"lwd")==0) strcpy(out_token, op_lwd);
