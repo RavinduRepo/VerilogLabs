@@ -263,9 +263,18 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             BRANCH_SELECT = 1'b0;
             JUMP_SELECT = 1'b0;  
         end
-        8'b00001001: // mult
+        8'b00001001: // shift logically
         begin
             ALU_OP = 3'b101; //ALUOP COMMAND
+            TWOS_COMP = 1'b0;
+            IMMIDIATE_SELECT = 1'b1;
+            REG_WRITE = 1'b1; 
+            BRANCH_SELECT = 1'b0;
+            JUMP_SELECT = 1'b0;  
+        end
+        8'b00001010: // shift arithmaticaly
+        begin
+            ALU_OP = 3'b110; //ALUOP COMMAND
             TWOS_COMP = 1'b0;
             IMMIDIATE_SELECT = 1'b1;
             REG_WRITE = 1'b1; 

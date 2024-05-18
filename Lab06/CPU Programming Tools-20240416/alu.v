@@ -62,15 +62,15 @@ module logical_shift (DATA, SHIFTAMOUNT, RESULT);
     integer j;
     always @(*) begin
         RESULT = DATA;
-        OFFSET = SHIFTAMOUNT;
         if (!SHIFTAMOUNT[`REG_SIZE-1]) begin // left shift
+            OFFSET = SHIFTAMOUNT;
             for (i = 0; i < OFFSET; i = i + 1) begin
-                for (j = 0; j < `REG_SIZE; j = j + 1) begin
+                for (j = `REG_SIZE; j > 0 ; j = j - 1) begin
                     RESULT[j] = RESULT[j - 1];
                     if (j == 0) begin
-                    RESULT[j] = 1'b0;   
+                        RESULT[j] = 1'b0;   
                     end
-                end
+                end 
             end
         end
         else if (SHIFTAMOUNT[`REG_SIZE-1]) begin // right shift
@@ -79,7 +79,7 @@ module logical_shift (DATA, SHIFTAMOUNT, RESULT);
                 for (j = 0; j < `REG_SIZE; j = j + 1) begin
                     RESULT[j] = RESULT[j + 1];
                     if (j == `REG_SIZE-1) begin
-                    RESULT[j] = 1'b0;   
+                        RESULT[j] = 1'b0;   
                     end
                 end          
             end
@@ -92,24 +92,34 @@ module arithmatic_shift (DATA, SHIFTAMOUNT, RESULT);
     input [`REG_SIZE-1:0] SHIFTAMOUNT;
     reg [`REG_SIZE-1:0] OFFSET;
     output reg [`REG_SIZE-1:0] RESULT;
+
     integer i;
+    integer j;
     always @(*) begin
         RESULT = DATA;
-            OFFSET = SHIFTAMOUNT;
         if (!SHIFTAMOUNT[`REG_SIZE-1]) begin // left shift
+            OFFSET = SHIFTAMOUNT;
             for (i = 0; i < OFFSET; i = i + 1) begin
-                RESULT = RESULT * 2;
+                for (j = `REG_SIZE; j > 0 ; j = j - 1) begin
+                    RESULT[j] = RESULT[j - 1];
+                    if (j == 0) begin
+                        RESULT[j] = DATA[j];   
+                    end
+                end 
             end
         end
         else if (SHIFTAMOUNT[`REG_SIZE-1]) begin // right shift
             OFFSET = -SHIFTAMOUNT;
             for (i = 0; i < OFFSET; i = i + 1) begin
-                RESULT = RESULT / 2;
+                for (j = 0; j < `REG_SIZE; j = j + 1) begin
+                    RESULT[j] = RESULT[j + 1];
+                    if (j == `REG_SIZE-1) begin
+                        RESULT[j] = DATA[j];   
+                    end
+                end          
             end
         end
     end
-
-
 endmodule
 
 
@@ -127,6 +137,8 @@ module alu (DATA1,DATA2,RESULT,SELECT,ZERO);
     wire [`REG_SIZE-1:0] OR_RESULT;
     wire [`REG_SIZE-1:0] MULT_RESULT;
     wire [`REG_SIZE-1:0] SL_RESULT; // shift locically (left or right)
+    wire [`REG_SIZE-1:0] SA_RESULT; // shift arithmaticaly (left or right)
+
 
 
     // making instences for each module with seperated output 
@@ -136,6 +148,7 @@ module alu (DATA1,DATA2,RESULT,SELECT,ZERO);
     or_module or1(DATA1, DATA2, OR_RESULT);
     mult_module mult1(DATA1, DATA2, MULT_RESULT);
     logical_shift sl1(DATA1, DATA2, SL_RESULT);
+    arithmatic_shift sa1(DATA1, DATA2, SA_RESULT);
 
 
     // to check of result is zero for the branch if equal command
@@ -162,8 +175,10 @@ module alu (DATA1,DATA2,RESULT,SELECT,ZERO);
             #1 RESULT = OR_RESULT;
         3'b100: // mult
             #2 RESULT = MULT_RESULT;
-        3'b101: // sll
+        3'b101: // sl (logical shift)
             #2 RESULT = SL_RESULT;
+        3'b110: // sa (arithmatic shift)
+            #2 RESULT = SA_RESULT;
         //default: 3'b1xx is reserved        
         
         endcase

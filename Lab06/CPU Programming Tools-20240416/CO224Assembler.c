@@ -53,7 +53,9 @@ int main( int argc, char *argv[] )
 	char *op_beq	= "00000111";
 	char *op_mult 	= "00001000";
 	char *op_sll 	= "00001001"; // logical left shift
-	char *op_srl 	= "00001011"; // logical right shift
+	char *op_srl 	= "00001001"; // logical right shift
+	char *op_sla 	= "00001010"; // arithmatic left shift
+	char *op_sra 	= "00001010"; // arithmatic right shift
 
 
 
@@ -144,8 +146,9 @@ int main( int argc, char *argv[] )
 		line_count++;
 		int count = 0;
 
-		// Flag for srl instruction
-		int is_srl = 0;
+		// Flag for shift right instruction
+		int is_srl = 0; //logicaly
+		int is_sra = 0; //arithmaticaly
 
 		while(in_token!=NULL)
 		{
@@ -163,6 +166,9 @@ int main( int argc, char *argv[] )
 			else if(strcasecmp(in_token,"mult")==0) strcpy(out_token, op_mult);
 			else if(strcasecmp(in_token,"sll")==0) strcpy(out_token, op_sll);
 			else if(strcasecmp(in_token,"srl")==0) strcpy(out_token, op_srl);
+			else if(strcasecmp(in_token,"sla")==0) strcpy(out_token, op_sla);
+			else if(strcasecmp(in_token,"sra")==0) strcpy(out_token, op_sra);
+
 
 
 
@@ -179,11 +185,7 @@ int main( int argc, char *argv[] )
 			else if(strcmp(in_token,"4")==0 || strcmp(in_token,"4\n")==0) strcpy(out_token, "00000100");
 			else if(strcmp(in_token,"5")==0 || strcmp(in_token,"5\n")==0) strcpy(out_token, "00000101");
 			else if(strcmp(in_token,"6")==0 || strcmp(in_token,"6\n")==0) strcpy(out_token, "00000110");
-			else if(strcmp(in_token,"7")==0 || strcmp(in_token,"7\n")==0) {
-				strcpy(out_token, "00000111"); 
-				is_srl = 1;
-
-			}
+			else if(strcmp(in_token,"7")==0 || strcmp(in_token,"7\n")==0) strcpy(out_token, "00000111"); 
 
 			// Encoding ignored operands
 			else if(strcasecmp(in_token,"X")==0) strcpy(out_token, "00000000");
