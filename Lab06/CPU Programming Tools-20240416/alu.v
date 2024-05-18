@@ -102,8 +102,11 @@ module arithmatic_shift_module (DATA, SHIFTAMOUNT, RESULT);
             for (i = 0; i < OFFSET; i = i + 1) begin
                 for (j = `REG_SIZE-1; j >= 0 ; j = j - 1) begin
                     RESULT[j] = RESULT[j - 1];
-                    if (j == 0) begin
+                    if (j == `REG_SIZE-1) begin
                         RESULT[j] = DATA[j];   
+                    end
+                    if (j == 0) begin
+                        RESULT[j] = 1'b0;   
                     end
                 end 
             end
