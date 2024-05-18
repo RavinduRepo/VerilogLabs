@@ -36,6 +36,26 @@ Generated output file	: <your_assembly_file_name>.machine
 
 #define LINE_SIZE 512
 
+void twos_complement(char *bitString) {
+    int i;
+    int n = strlen(bitString);
+    // Traverse the string to get first '1' from the last part
+    for (i = n - 1; i >= 0; i--) {
+        if (bitString[i] == '1')
+            break;
+    }
+    // If there exists no '1' concatenate 1 at the starting of string
+    if (i == -1)
+        printf("1%s", bitString);
+    else {
+        // Continue traversal after the position of first '1' and flip all the bits
+        for (int k = i - 1; k >= 0; k--) {
+            // Just flip the bit
+            bitString[k] = bitString[k] == '0' ? '1' : '0';
+        }
+    }
+}
+
 
 int main( int argc, char *argv[] )
 {
@@ -56,6 +76,11 @@ int main( int argc, char *argv[] )
 	char *op_srl 	= "00001001"; // logical right shift
 	char *op_sla 	= "00001010"; // arithmatic left shift
 	char *op_sra 	= "00001010"; // arithmatic right shift
+	char *op_ror 	= "00001011"; // rotate right
+	char *op_rol 	= "00001011"; // rotate left
+	char *op_bne	= "00001100"; // branch if not equal
+
+
 
 
 
@@ -146,9 +171,8 @@ int main( int argc, char *argv[] )
 		line_count++;
 		int count = 0;
 
-		// Flag for shift right instruction
-		int is_srl = 0; //logicaly
-		int is_sra = 0; //arithmaticaly
+		// Flag for shift/rotate right instruction
+		int is_right = 0;
 
 		while(in_token!=NULL)
 		{
@@ -164,10 +188,24 @@ int main( int argc, char *argv[] )
 			else if(strcasecmp(in_token,"j")==0) strcpy(out_token, op_j);
 			else if(strcasecmp(in_token,"beq")==0) strcpy(out_token, op_beq);
 			else if(strcasecmp(in_token,"mult")==0) strcpy(out_token, op_mult);
-			else if(strcasecmp(in_token,"sll")==0) strcpy(out_token, op_sll);
-			else if(strcasecmp(in_token,"srl")==0) strcpy(out_token, op_srl);
-			else if(strcasecmp(in_token,"sla")==0) strcpy(out_token, op_sla);
-			else if(strcasecmp(in_token,"sra")==0) strcpy(out_token, op_sra);
+			else if(strcasecmp(in_token,"sll")==0) strcpy(out_token, op_sll); // logical left shift
+			else if(strcasecmp(in_token,"srl")==0){ // logical righr shift
+				strcpy(out_token, op_srl);
+				is_right =1;
+			}
+			else if(strcasecmp(in_token,"sla")==0) strcpy(out_token, op_sla); // arithmatic left shift
+			else if(strcasecmp(in_token,"sra")==0){ // arithmatic right shift
+				strcpy(out_token, op_sra);
+				is_right = 1;
+			}
+			else if(strcasecmp(in_token,"rol")==0) strcpy(out_token, op_rol); // left rotate
+			else if(strcasecmp(in_token,"ror")==0){
+				strcpy(out_token, op_ror); // right rotate
+				is_right = 1;
+			}
+			else if(strcasecmp(in_token,"bne")==0) strcpy(out_token, op_bne);
+
+
 
 
 
@@ -226,7 +264,12 @@ int main( int argc, char *argv[] )
 				count = 99;
 				break;
 			}
+
+			// adding the capability to get twos complement
 			
+			if (is_right && count == 4){
+				twos_complement(out_token);
+			}
 			fputs(out_token, fo);			
 			in_token = strtok(NULL, delim);
 		}

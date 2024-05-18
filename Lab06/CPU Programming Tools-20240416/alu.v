@@ -52,7 +52,7 @@ module mult_module (DATA1,DATA2,RESULT);
 
 endmodule
 
-module logical_shift (DATA, SHIFTAMOUNT, RESULT);
+module logical_shift_module (DATA, SHIFTAMOUNT, RESULT);
     input [`REG_SIZE-1:0] DATA;
     input [`REG_SIZE-1:0] SHIFTAMOUNT;
     reg [`REG_SIZE-1:0] OFFSET;
@@ -65,7 +65,7 @@ module logical_shift (DATA, SHIFTAMOUNT, RESULT);
         if (!SHIFTAMOUNT[`REG_SIZE-1]) begin // left shift
             OFFSET = SHIFTAMOUNT;
             for (i = 0; i < OFFSET; i = i + 1) begin
-                for (j = `REG_SIZE; j > 0 ; j = j - 1) begin
+                for (j = `REG_SIZE-1; j >= 0 ; j = j - 1) begin
                     RESULT[j] = RESULT[j - 1];
                     if (j == 0) begin
                         RESULT[j] = 1'b0;   
@@ -87,7 +87,7 @@ module logical_shift (DATA, SHIFTAMOUNT, RESULT);
     end
 endmodule
 
-module arithmatic_shift (DATA, SHIFTAMOUNT, RESULT);
+module arithmatic_shift_module (DATA, SHIFTAMOUNT, RESULT);
     input [`REG_SIZE-1:0] DATA;
     input [`REG_SIZE-1:0] SHIFTAMOUNT;
     reg [`REG_SIZE-1:0] OFFSET;
@@ -100,7 +100,7 @@ module arithmatic_shift (DATA, SHIFTAMOUNT, RESULT);
         if (!SHIFTAMOUNT[`REG_SIZE-1]) begin // left shift
             OFFSET = SHIFTAMOUNT;
             for (i = 0; i < OFFSET; i = i + 1) begin
-                for (j = `REG_SIZE; j > 0 ; j = j - 1) begin
+                for (j = `REG_SIZE-1; j >= 0 ; j = j - 1) begin
                     RESULT[j] = RESULT[j - 1];
                     if (j == 0) begin
                         RESULT[j] = DATA[j];   
@@ -120,6 +120,55 @@ module arithmatic_shift (DATA, SHIFTAMOUNT, RESULT);
             end
         end
     end
+endmodule
+
+module rotate_module(DATA, ROTATEAMOUNT, RESULT);
+    input [`REG_SIZE-1:0] DATA;
+    input [`REG_SIZE-1:0] ROTATEAMOUNT;
+    reg [`REG_SIZE-1:0] OFFSET;
+    output reg [`REG_SIZE-1:0] RESULT;
+    reg TEMPARY;
+
+    integer i;
+    integer j;
+    always @(*) begin
+        RESULT = DATA;
+        if (!ROTATEAMOUNT[`REG_SIZE-1]) begin // left rotate
+            OFFSET = ROTATEAMOUNT;
+            for (i = 0; i < OFFSET; i = i + 1) begin
+                for (j = `REG_SIZE-1; j >= 0 ; j = j - 1) begin
+                    if (j == `REG_SIZE-1) begin
+                        TEMPARY = RESULT[j]; 
+                        RESULT[j] = RESULT[j - 1];
+                    end
+                    else if (j == 0) begin
+                        RESULT[j] = TEMPARY;
+                    end
+                    else begin
+                        RESULT[j] = RESULT[j - 1];
+                    end
+                end 
+            end
+        end
+        else if (ROTATEAMOUNT[`REG_SIZE-1]) begin // right rotate
+            OFFSET = -ROTATEAMOUNT;
+            for (i = 0; i < OFFSET; i = i + 1) begin
+                for (j = 0; j < `REG_SIZE; j = j + 1) begin
+                    if (j == 0) begin
+                        TEMPARY = RESULT[j]; 
+                        RESULT[j] = RESULT[j + 1];
+                    end
+                    else if (j == `REG_SIZE-1) begin
+                        RESULT[j] = TEMPARY;
+                    end
+                    else begin
+                        RESULT[j] = RESULT[j + 1];
+                    end
+                end          
+            end
+        end
+    end
+
 endmodule
 
 
@@ -138,8 +187,7 @@ module alu (DATA1,DATA2,RESULT,SELECT,ZERO);
     wire [`REG_SIZE-1:0] MULT_RESULT;
     wire [`REG_SIZE-1:0] SL_RESULT; // shift locically (left or right)
     wire [`REG_SIZE-1:0] SA_RESULT; // shift arithmaticaly (left or right)
-
-
+    wire [`REG_SIZE-1:0] RO_RESULT; // rotate (left or right)
 
     // making instences for each module with seperated output 
     mov_module mov1(DATA2, MOV_RESULT);
@@ -147,9 +195,9 @@ module alu (DATA1,DATA2,RESULT,SELECT,ZERO);
     and_module and1(DATA1, DATA2, AND_RESULT);
     or_module or1(DATA1, DATA2, OR_RESULT);
     mult_module mult1(DATA1, DATA2, MULT_RESULT);
-    logical_shift sl1(DATA1, DATA2, SL_RESULT);
-    arithmatic_shift sa1(DATA1, DATA2, SA_RESULT);
-
+    logical_shift_module sl1(DATA1, DATA2, SL_RESULT);
+    arithmatic_shift_module sa1(DATA1, DATA2, SA_RESULT);
+    rotate_module ro1(DATA1, DATA2, RO_RESULT);
 
     // to check of result is zero for the branch if equal command
     always @(*) begin
@@ -179,6 +227,8 @@ module alu (DATA1,DATA2,RESULT,SELECT,ZERO);
             #2 RESULT = SL_RESULT;
         3'b110: // sa (arithmatic shift)
             #2 RESULT = SA_RESULT;
+        3'b111: // ro (rotate)
+            #2 RESULT = RO_RESULT;
         //default: 3'b1xx is reserved        
         
         endcase

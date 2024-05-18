@@ -151,13 +151,31 @@ module jump_concatenate(PCOUT,LEFTSHIFTEDJUMP,JUMPADDRESS);
 endmodule
 
 // and module for branch if equal instruction
-module branch_and(DATA1,DATA2,RESULT);
+module and_gate(DATA1,DATA2,RESULT);
     input DATA1;
     input DATA2;
     output RESULT;
 
     assign RESULT = DATA1 & DATA2;
 
+endmodule
+
+// for branch if not equal command
+module not_gate(DATA,RESULT);
+    input DATA;
+    output RESULT;
+
+    assign RESULT = ~DATA;
+
+endmodule
+
+// to select branch (eq or neq)
+module or_gate(DATA1,DATA2,RESULT);
+    input DATA1;
+    input DATA2;
+    output RESULT;
+
+    assign RESULT = DATA1 | DATA2;
 endmodule
 
 // add module for branch if equal instruction
@@ -172,9 +190,9 @@ module branch_add(PCOUT,LEFTSHIFTEDBRANCH,BRANCHADDRESS);
 endmodule
 
 // add, sub, and, or, mov, loadi
-module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SELECT,JUMP_SELECT);
+module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SELECT,BRANCH_NE_SELECT,JUMP_SELECT);
     input [`OPCODE_SIZE-1:0] OPCODE;
-    output reg IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SELECT,JUMP_SELECT;
+    output reg IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SELECT,BRANCH_NE_SELECT,JUMP_SELECT;
     output reg [`ALU_OP_SIZE-1:0] ALU_OP;
 
     // always block * to run the block whenever any input changes  
@@ -189,6 +207,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             IMMIDIATE_SELECT = 1'b1;
             REG_WRITE = 1'b1;
             BRANCH_SELECT = 1'b0;
+            BRANCH_NE_SELECT = 1'b0;
             JUMP_SELECT = 1'b0;
         end
         8'b00000001: // mov
@@ -198,6 +217,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             IMMIDIATE_SELECT = 1'b0;
             REG_WRITE = 1'b1;
             BRANCH_SELECT = 1'b0;
+            BRANCH_NE_SELECT = 1'b0;
             JUMP_SELECT = 1'b0;     
         end   
         8'b00000010: // add
@@ -207,6 +227,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             IMMIDIATE_SELECT = 1'b0;
             REG_WRITE = 1'b1;
             BRANCH_SELECT = 1'b0;
+            BRANCH_NE_SELECT = 1'b0;
             JUMP_SELECT = 1'b0;   
         end
         8'b00000011: // sub
@@ -216,6 +237,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             IMMIDIATE_SELECT = 1'b0;
             REG_WRITE = 1'b1;
             BRANCH_SELECT = 1'b0;
+            BRANCH_NE_SELECT = 1'b0;
             JUMP_SELECT = 1'b0;  
         end
         8'b00000100: // and
@@ -225,6 +247,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             IMMIDIATE_SELECT = 1'b0;
             REG_WRITE = 1'b1;
             BRANCH_SELECT = 1'b0;
+            BRANCH_NE_SELECT = 1'b0;
             JUMP_SELECT = 1'b0; 
         end  
         8'b00000101: // or
@@ -234,6 +257,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             IMMIDIATE_SELECT = 1'b0;
             REG_WRITE = 1'b1; 
             BRANCH_SELECT = 1'b0;
+            BRANCH_NE_SELECT = 1'b0;
             JUMP_SELECT = 1'b0;  
         end   
         8'b00000110: // j 
@@ -243,6 +267,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             IMMIDIATE_SELECT = 1'b0;
             REG_WRITE = 1'b0; 
             BRANCH_SELECT = 1'b0;
+            BRANCH_NE_SELECT = 1'b0;
             JUMP_SELECT = 1'b1;  
         end  
         8'b00000111: // beq
@@ -252,6 +277,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             IMMIDIATE_SELECT = 1'b0;
             REG_WRITE = 1'b0; 
             BRANCH_SELECT = 1'b1;
+            BRANCH_NE_SELECT = 1'b0;
             JUMP_SELECT = 1'b0;  
         end 
         8'b00001000: // mult
@@ -261,6 +287,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             IMMIDIATE_SELECT = 1'b0;
             REG_WRITE = 1'b1; 
             BRANCH_SELECT = 1'b0;
+            BRANCH_NE_SELECT = 1'b0;
             JUMP_SELECT = 1'b0;  
         end
         8'b00001001: // shift logically
@@ -270,6 +297,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             IMMIDIATE_SELECT = 1'b1;
             REG_WRITE = 1'b1; 
             BRANCH_SELECT = 1'b0;
+            BRANCH_NE_SELECT = 1'b0;
             JUMP_SELECT = 1'b0;  
         end
         8'b00001010: // shift arithmaticaly
@@ -279,6 +307,27 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             IMMIDIATE_SELECT = 1'b1;
             REG_WRITE = 1'b1; 
             BRANCH_SELECT = 1'b0;
+            BRANCH_NE_SELECT = 1'b0;
+            JUMP_SELECT = 1'b0;  
+        end
+        8'b00001011: // rotate
+        begin
+            ALU_OP = 3'b111; //ALUOP COMMAND
+            TWOS_COMP = 1'b0;
+            IMMIDIATE_SELECT = 1'b1;
+            REG_WRITE = 1'b1; 
+            BRANCH_SELECT = 1'b0;
+            BRANCH_NE_SELECT = 1'b0;
+            JUMP_SELECT = 1'b0;  
+        end
+        8'b00001100: // bne (branch if not equal)
+        begin
+            ALU_OP = 3'b000; //ALUOP COMMAND
+            TWOS_COMP = 1'b1;
+            IMMIDIATE_SELECT = 1'b0;
+            REG_WRITE = 1'b0; 
+            BRANCH_SELECT = 1'b0;
+            BRANCH_NE_SELECT = 1'b1;
             JUMP_SELECT = 1'b0;  
         end
         default:
@@ -331,15 +380,25 @@ module cpu(PCOUT, INSTRUCTION, CLK, RESET);
     //branch_add
     wire [31:0] BRANCHADDRESS;
 
-    //branch_and
+    //branchEQ_and
     wire ZERO_and_BRANCHSELECT;
+
+    //branchNEQ_and
+    wire NOT_ZERO_and_BRANCHSELECT;
+
+    //branch_or
+    wire BRANCH_SELECT;
+
+    //branch_not
+    wire NOT_ZERO;
 
     //control_unit
     wire WRITEENABLE;
     wire TWOS_COMP_SELECT;
     wire IMMIDIATE_SELECT;
     wire [`ALU_OP_SIZE-1:0] ALUOP;
-    wire BRANCH_SELECT;
+    wire BRANCH_EQ_SELECT;
+    wire BRANCH_NE_SELECT;
     wire JUMP_SELECT;
 
     //register_file
@@ -370,7 +429,7 @@ module cpu(PCOUT, INSTRUCTION, CLK, RESET);
     left_shift left_shift_for_branch(SIGNEXTENDEDBRANCH,LEFTSHIFTEDBRANCH); // left shift for branch iimidiate value
     branch_add branch_add(NEXTPCOUT,LEFTSHIFTEDBRANCH,BRANCHADDRESS);    // adding address to PC+4 for branch instruction
 
-    control_unit control_unit(OPCODE,ALUOP,IMMIDIATE_SELECT,WRITEENABLE,TWOS_COMP_SELECT,BRANCH_SELECT,JUMP_SELECT);  // Control unit
+    control_unit control_unit(OPCODE,ALUOP,IMMIDIATE_SELECT,WRITEENABLE,TWOS_COMP_SELECT,BRANCH_EQ_SELECT,BRANCH_NE_SELECT,JUMP_SELECT);  // Control unit
 
     reg_file reg_file(ALURESULT,REGOUT1,REGOUT2,WRITEREG,READREG1,READREG2,WRITEENABLE,CLK,RESET);  // Register file
     twos_complement twoscomp(REGOUT2,TWOS_COMP);    // Twos complement 
@@ -378,8 +437,12 @@ module cpu(PCOUT, INSTRUCTION, CLK, RESET);
     mux_module8 twos_complement_mux(REGOUT2,TWOS_COMP,TWOS_COMP_SELECTED,TWOS_COMP_SELECT);      // mux to select the two's complement
     mux_module8 alu_immidiate_mux(TWOS_COMP_SELECTED,IMMIDIATE,IMMIDIATE_SELECTED,IMMIDIATE_SELECT);     // Mux to select the immidate value from the instruction
     
-    branch_and branch_and(BRANCH_SELECT,ZERO,ZERO_and_BRANCHSELECT);    // and gate for if_Zero and Branch control signal
-    mux_module32 branch_select_mux(NEXTPCOUT,BRANCHADDRESS,BRANCH_SELECTED,ZERO_and_BRANCHSELECT); // selcting mux whether to branch or not
+
+    not_gate branch_neq_not(ZERO,NOT_ZERO); // not gate form alu
+    and_gate branch_eq_and(BRANCH_EQ_SELECT,ZERO,ZERO_and_BRANCHSELECT);    // and gate for if_Zero and Branch control signal
+    and_gate branch_neq_and(BRANCH_NE_SELECT,NOT_ZERO,NOT_ZERO_and_BRANCHSELECT);   // and gate for if_notZero and Branch control signal
+    or_gate branch_or(NOT_ZERO_and_BRANCHSELECT,ZERO_and_BRANCHSELECT,BRANCH_SELECT);
+    mux_module32 branch_select_mux(NEXTPCOUT,BRANCHADDRESS,BRANCH_SELECTED,BRANCH_SELECT); // selcting mux whether to branch or not
 
     mux_module32 jump_select_mux(BRANCH_SELECTED,JUMPADDRESS,JUMP_SELECTED,JUMP_SELECT); // selcting mux whether to branch or not
 
