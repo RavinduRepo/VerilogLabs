@@ -36,6 +36,18 @@ Generated output file	: <your_assembly_file_name>.machine
 
 #define LINE_SIZE 512
 
+// convertes inary string to decimal value
+int binaryToDecimal(char *binary) {
+    int decimal = 0;
+    for (int i = 0; i < 8; i++) {
+        if (binary[i] == '1') {
+            decimal += 1 << (7 - i);
+        }
+    }
+    return decimal;
+}
+
+// twos complement function
 void twos_complement(char *bitString) {
     int i;
     int n = strlen(bitString);
@@ -97,6 +109,11 @@ int main( int argc, char *argv[] )
 	char *in_token;
 	char out_token[] = "00000000";
 	char out_file[256];
+
+	char repeat_token1[] = "00000000";
+	char repeat_token2[] = "00000000";
+	char repeat_token3[] = "00000000";
+	char repeat_token4[] = "00000000";
 
 	strcpy(out_file,argv[1]);
 	strcat(out_file,".machine");
@@ -174,6 +191,9 @@ int main( int argc, char *argv[] )
 		// Flag for shift/rotate right instruction
 		int is_right = 0;
 
+		// Flag for shift/rotate instruction
+		int is_repeat = 0;
+
 		while(in_token!=NULL)
 		{
 			count++;
@@ -188,25 +208,34 @@ int main( int argc, char *argv[] )
 			else if(strcasecmp(in_token,"j")==0) strcpy(out_token, op_j);
 			else if(strcasecmp(in_token,"beq")==0) strcpy(out_token, op_beq);
 			else if(strcasecmp(in_token,"mult")==0) strcpy(out_token, op_mult);
-			else if(strcasecmp(in_token,"sll")==0) strcpy(out_token, op_sll); // logical left shift
+			else if(strcasecmp(in_token,"sll")==0){
+				strcpy(out_token, op_sll); // logical left shift
+				is_repeat = 1;
+			}
 			else if(strcasecmp(in_token,"srl")==0){ // logical righr shift
 				strcpy(out_token, op_srl);
 				is_right =1;
+				is_repeat = 1;
 			}
-			else if(strcasecmp(in_token,"sla")==0) strcpy(out_token, op_sla); // arithmatic left shift
+			else if(strcasecmp(in_token,"sla")==0){
+				strcpy(out_token, op_sla); // arithmatic left shift
+				is_repeat = 1;
+			}
 			else if(strcasecmp(in_token,"sra")==0){ // arithmatic right shift
 				strcpy(out_token, op_sra);
 				is_right = 1;
+				is_repeat = 1;
 			}
-			else if(strcasecmp(in_token,"rol")==0) strcpy(out_token, op_rol); // left rotate
+			else if(strcasecmp(in_token,"rol")==0){
+				strcpy(out_token, op_rol); // left rotate
+				is_repeat = 1;
+			}
 			else if(strcasecmp(in_token,"ror")==0){
 				strcpy(out_token, op_ror); // right rotate
 				is_right = 1;
+				is_repeat = 1;
 			}
 			else if(strcasecmp(in_token,"bne")==0) strcpy(out_token, op_bne);
-
-
-
 
 
 
@@ -265,13 +294,66 @@ int main( int argc, char *argv[] )
 				break;
 			}
 
-			// adding the capability to get twos complement
-			
-			if (is_right && count == 4){
-				twos_complement(out_token);
+			if (is_repeat){ // check if the command shift/rotate
+
+				// Storing each tolken of the line to repeat the shift amount times
+				if (count == 1){
+					strcpy(repeat_token1, out_token);
+					in_token = strtok(NULL, delim);
+				}
+				if (count == 2){
+					strcpy(repeat_token2, out_token);
+					in_token = strtok(NULL, delim);
+				}
+				if (count == 3){
+					strcpy(repeat_token3, out_token);
+					in_token = strtok(NULL, delim);
+				}
+				if (count == 4){
+					strcpy(repeat_token4, out_token);
+					in_token = strtok(NULL, delim);
+
+					// adding the capability to right shift/left shift and setting shift the value to 1
+					if (is_right){
+						strcpy(repeat_token4, "11111111");	// shifting only once in negative(right)	
+					}
+					else {
+						strcpy(repeat_token4, "00000001");	// shifting only once in positive(left)
+					}	
+					///____________if need to see the shift/rotate amount, use this if and remove the above if________
+					//// adding the capability to get twos complement
+					// if (is_right && count == 4){
+					// 	twos_complement(out_token);
+					// }
+
+					// repeating the command shift number of times to shift required numert of times
+					for (int i = binaryToDecimal(out_token); i > 0; i--){
+						fputs(repeat_token1, fo);
+						fputs(repeat_token2, fo);
+						fputs(repeat_token3, fo);
+						fputs(repeat_token4, fo);
+						if (i != 1) fputs("\n", fo); 	// newline char is not putting at the end of the last command(after loop it is putted)
+						}
+				}
 			}
-			fputs(out_token, fo);			
-			in_token = strtok(NULL, delim);
+			else{ // for commands otherthan shift/rotate 
+				// adding the capability to right shift/ left shift and setting the value to 1
+				if (count == 4){
+					if (is_right && is_repeat){
+						strcpy(out_token, "11111111");	// shifting only once in negative(right)	
+					}
+					else if ((!is_right) && is_repeat){
+						strcpy(out_token, "00000001");	// shifting only once in positive(left)
+					}			
+				}
+				///____________if need to see the shift/rotate amount, use this if and remove the above if________
+				//// adding the capability to get twos complement
+				// if (is_right && count == 4){
+				// 	twos_complement(out_token);
+				// }
+				fputs(out_token, fo);			
+				in_token = strtok(NULL, delim);
+			}
 		}
 		
 		if(count==4) // Line contains a valid instruction

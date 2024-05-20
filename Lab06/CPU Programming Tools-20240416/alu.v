@@ -63,33 +63,24 @@ endmodule
 module logical_shift_module (DATA, SHIFTAMOUNT, RESULT);
     input [`REG_SIZE-1:0] DATA;
     input [`REG_SIZE-1:0] SHIFTAMOUNT;
-    reg [`REG_SIZE-1:0] OFFSET;
     output reg [`REG_SIZE-1:0] RESULT;
 
-    integer i;
     integer j;
     always @(*) begin
-        RESULT = DATA;
         if (!SHIFTAMOUNT[`REG_SIZE-1]) begin // left shift
-            OFFSET = SHIFTAMOUNT;
-            for (i = 0; i < OFFSET; i = i + 1) begin
-                for (j = `REG_SIZE-1; j >= 0 ; j = j - 1) begin
-                    RESULT[j] = RESULT[j - 1];
-                    if (j == 0) begin
-                        RESULT[j] = 1'b0;   
-                    end
-                end 
+            for (j = `REG_SIZE-1; j >= 0 ; j = j - 1) begin
+                RESULT[j] = DATA[j - 1];
+                if (j == 0) begin
+                    RESULT[j] = 1'b0;   
+                end
             end
         end
         else if (SHIFTAMOUNT[`REG_SIZE-1]) begin // right shift
-            OFFSET = -SHIFTAMOUNT;
-            for (i = 0; i < OFFSET; i = i + 1) begin
-                for (j = 0; j < `REG_SIZE; j = j + 1) begin
-                    RESULT[j] = RESULT[j + 1];
-                    if (j == `REG_SIZE-1) begin
-                        RESULT[j] = 1'b0;   
-                    end
-                end          
+            for (j = 0; j < `REG_SIZE; j = j + 1) begin
+                RESULT[j] = DATA[j + 1];
+                if (j == `REG_SIZE-1) begin
+                    RESULT[j] = 1'b0;   
+                end
             end
         end
     end
@@ -98,37 +89,28 @@ endmodule
 module arithmatic_shift_module (DATA, SHIFTAMOUNT, RESULT);
     input [`REG_SIZE-1:0] DATA;
     input [`REG_SIZE-1:0] SHIFTAMOUNT;
-    reg [`REG_SIZE-1:0] OFFSET;
     output reg [`REG_SIZE-1:0] RESULT;
 
-    integer i;
     integer j;
     always @(*) begin
-        RESULT = DATA;
         if (!SHIFTAMOUNT[`REG_SIZE-1]) begin // left shift
-            OFFSET = SHIFTAMOUNT;
-            for (i = 0; i < OFFSET; i = i + 1) begin
-                for (j = `REG_SIZE-1; j >= 0 ; j = j - 1) begin
-                    RESULT[j] = RESULT[j - 1];
-                    if (j == `REG_SIZE-1) begin
-                        RESULT[j] = DATA[j];   
-                    end
-                    if (j == 0) begin
-                        RESULT[j] = 1'b0;   
-                    end
-                end 
-            end
+            for (j = `REG_SIZE-1; j >= 0 ; j = j - 1) begin
+                RESULT[j] = DATA[j - 1];
+                if (j == `REG_SIZE-1) begin
+                    RESULT[j] = DATA[j];   
+                end
+                if (j == 0) begin
+                    RESULT[j] = 1'b0;   
+                end
+            end 
         end
         else if (SHIFTAMOUNT[`REG_SIZE-1]) begin // right shift
-            OFFSET = -SHIFTAMOUNT;
-            for (i = 0; i < OFFSET; i = i + 1) begin
-                for (j = 0; j < `REG_SIZE; j = j + 1) begin
-                    RESULT[j] = RESULT[j + 1];
-                    if (j == `REG_SIZE-1) begin
-                        RESULT[j] = DATA[j];   
-                    end
-                end          
-            end
+            for (j = 0; j < `REG_SIZE; j = j + 1) begin
+                RESULT[j] = DATA[j + 1];
+                if (j == `REG_SIZE-1) begin
+                    RESULT[j] = DATA[j];   
+                end
+            end          
         end
     end
 endmodule
@@ -136,47 +118,38 @@ endmodule
 module rotate_module(DATA, ROTATEAMOUNT, RESULT);
     input [`REG_SIZE-1:0] DATA;
     input [`REG_SIZE-1:0] ROTATEAMOUNT;
-    reg [`REG_SIZE-1:0] OFFSET;
     output reg [`REG_SIZE-1:0] RESULT;
     reg TEMPARY;
 
-    integer i;
     integer j;
     always @(*) begin
-        RESULT = DATA;
         if (!ROTATEAMOUNT[`REG_SIZE-1]) begin // left rotate
-            OFFSET = ROTATEAMOUNT;
-            for (i = 0; i < OFFSET; i = i + 1) begin
-                for (j = `REG_SIZE-1; j >= 0 ; j = j - 1) begin
-                    if (j == `REG_SIZE-1) begin
-                        TEMPARY = RESULT[j]; 
-                        RESULT[j] = RESULT[j - 1];
-                    end
-                    else if (j == 0) begin
-                        RESULT[j] = TEMPARY;
-                    end
-                    else begin
-                        RESULT[j] = RESULT[j - 1];
-                    end
-                end 
-            end
+            for (j = `REG_SIZE-1; j >= 0 ; j = j - 1) begin
+                if (j == `REG_SIZE-1) begin
+                    TEMPARY = DATA[j]; 
+                    RESULT[j] = DATA[j - 1];
+                end
+                else if (j == 0) begin
+                    RESULT[j] = TEMPARY;
+                end
+                else begin
+                    RESULT[j] = DATA[j - 1];
+                end
+            end 
         end
         else if (ROTATEAMOUNT[`REG_SIZE-1]) begin // right rotate
-            OFFSET = -ROTATEAMOUNT;
-            for (i = 0; i < OFFSET; i = i + 1) begin
-                for (j = 0; j < `REG_SIZE; j = j + 1) begin
-                    if (j == 0) begin
-                        TEMPARY = RESULT[j]; 
-                        RESULT[j] = RESULT[j + 1];
-                    end
-                    else if (j == `REG_SIZE-1) begin
-                        RESULT[j] = TEMPARY;
-                    end
-                    else begin
-                        RESULT[j] = RESULT[j + 1];
-                    end
-                end          
-            end
+            for (j = 0; j < `REG_SIZE; j = j + 1) begin
+                if (j == 0) begin
+                    TEMPARY = DATA[j]; 
+                    RESULT[j] = DATA[j + 1];
+                end
+                else if (j == `REG_SIZE-1) begin
+                    RESULT[j] = TEMPARY;
+                end
+                else begin
+                    RESULT[j] = DATA[j + 1];
+                end
+            end          
         end
     end
 
