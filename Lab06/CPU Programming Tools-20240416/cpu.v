@@ -161,7 +161,7 @@ module and_gate(DATA1,DATA2,RESULT);
 endmodule
 
 // for branch if not equal command
-module not_gate(DATA,RESULT);
+module not_gate(DATA,RESULT); 
     input DATA;
     output RESULT;
 

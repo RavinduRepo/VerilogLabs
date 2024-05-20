@@ -1,5 +1,5 @@
-loadi 1 0x03 // r1 = 3
-loadi 2 0x04 // r2 = 4
+loadi 1 0xFD // r1 = 3
+loadi 2 0xFC // r2 = 4
 mult 4 1 2 // r4 = r1 * r2
 sll 4 4 0x03 // r4 = r1 << 3
 srl 4 4 0x03 // r4 = r1 >> 3

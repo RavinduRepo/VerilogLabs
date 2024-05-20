@@ -46,9 +46,17 @@ endmodule
 module mult_module (DATA1,DATA2,RESULT);
     input [`REG_SIZE-1:0] DATA1;
     input [`REG_SIZE-1:0] DATA2;
-    output [`REG_SIZE-1:0] RESULT;
+    output reg [`REG_SIZE-1:0] RESULT;
 
-    assign RESULT = DATA1 * DATA2;
+    integer i;
+    always @(*) begin
+        RESULT = DATA1;
+
+        for (i = 1; i < DATA2; i = i + 1) begin
+            RESULT = RESULT + DATA1;
+        end
+    end
+    // assign RESULT = DATA1 * DATA2;
 
 endmodule
 
