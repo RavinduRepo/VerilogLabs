@@ -1,7 +1,6 @@
 # This script takes in an assembly file and generates a file (named "instr_mem.mem") that contains 
 # machine code which can be loaded into instr_mem array in Verilog (inside cpu.v)
 # Author: Kisaru Liyanage
-
 if [ $# -ne 1 ]; then
     echo "Usage: $0 <assembly_file>"
     exit 1
