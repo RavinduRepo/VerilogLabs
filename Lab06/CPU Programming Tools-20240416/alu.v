@@ -320,7 +320,6 @@ module arithmatic_shift_module (DATA, SHIFTAMOUNT, RESULT);
 
         if (SHIFTAMOUNT[7]) begin // Right shift
             OFFSET = -SHIFTAMOUNT;
-            #2
             RESULT = CALCULATE_RS[2];
             // If SHIFTAMOUNT >= 8'd8 (or 8'b00000111) result is 8'd0 (or 8'b00000000)
             if (OFFSET >= 8'd8) begin
@@ -329,7 +328,6 @@ module arithmatic_shift_module (DATA, SHIFTAMOUNT, RESULT);
         end
         else if (!SHIFTAMOUNT[7]) begin // Left shift
             OFFSET = SHIFTAMOUNT;
-            #2
             RESULT = CALCULATE_LS[2];
             // If SHIFTAMOUNT >= 8'd8 (or 8'b00000111) result is 8'd0 (or 8'b00000000)
             if (OFFSET >= 8'd8) begin
