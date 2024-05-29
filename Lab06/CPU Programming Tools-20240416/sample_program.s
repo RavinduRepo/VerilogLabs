@@ -9,5 +9,5 @@ sra 5 5 0x02 // r5 = r5 >> 2
 loadi 6 0xFD // r5 = -3
 ror 6 6 0x02 // r5 = r5 >> 2 rotate
 rol 6 6 0x02 // r5 = r5 << 2 rotate
-loadi 7 0xF1 //
+loadi 7 0xF1 // r7 = -15
 bne 0xF9 5 7 // branch to line 4
