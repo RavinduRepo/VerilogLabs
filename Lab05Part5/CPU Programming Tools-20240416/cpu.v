@@ -193,10 +193,10 @@ endmodule
 
 // add, sub, and, or, mov, loadi
 module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SELECT,BRANCH_NE_SELECT,JUMP_SELECT,
-                    BUSYWAIT,DATAMEMORY_READ,DATAMEMORY_WRITE,REG_WRITE_SELECT);
+                    BUSYWAIT,DATAMEMORY_READ,DATAMEMORY_WRITE,REGSOURCE_SELECT);
     input [`OPCODE_SIZE-1:0] OPCODE;
     input BUSYWAIT;
-    output reg IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SELECT,BRANCH_NE_SELECT,JUMP_SELECT,DATAMEMORY_READ,DATAMEMORY_WRITE,REG_WRITE_SELECT;
+    output reg IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SELECT,BRANCH_NE_SELECT,JUMP_SELECT,DATAMEMORY_READ,DATAMEMORY_WRITE,REGSOURCE_SELECT;
     output reg [`ALU_OP_SIZE-1:0] ALU_OP;
 
 
@@ -216,7 +216,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             JUMP_SELECT = 1'b0;
             DATAMEMORY_READ = 1'b0;
             DATAMEMORY_WRITE = 1'b0;
-            REG_WRITE_SELECT = 1'b0;
+            REGSOURCE_SELECT = 1'b0;
         end
         8'b00000001: // mov
         begin
@@ -229,7 +229,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             JUMP_SELECT = 1'b0;   
             DATAMEMORY_READ = 1'b0;
             DATAMEMORY_WRITE = 1'b0;
-            REG_WRITE_SELECT = 1'b0;  
+            REGSOURCE_SELECT = 1'b0;  
         end   
         8'b00000010: // add
         begin
@@ -242,7 +242,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             JUMP_SELECT = 1'b0;   
             DATAMEMORY_READ = 1'b0;
             DATAMEMORY_WRITE = 1'b0;
-            REG_WRITE_SELECT = 1'b0;
+            REGSOURCE_SELECT = 1'b0;
         end
         8'b00000011: // sub
         begin
@@ -255,7 +255,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             JUMP_SELECT = 1'b0;  
             DATAMEMORY_READ = 1'b0;
             DATAMEMORY_WRITE = 1'b0;
-            REG_WRITE_SELECT = 1'b0;
+            REGSOURCE_SELECT = 1'b0;
         end
         8'b00000100: // and
         begin
@@ -268,7 +268,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             JUMP_SELECT = 1'b0; 
             DATAMEMORY_READ = 1'b0;
             DATAMEMORY_WRITE = 1'b0;
-            REG_WRITE_SELECT = 1'b0;
+            REGSOURCE_SELECT = 1'b0;
         end  
         8'b00000101: // or
         begin
@@ -281,7 +281,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             JUMP_SELECT = 1'b0;  
             DATAMEMORY_READ = 1'b0;
             DATAMEMORY_WRITE = 1'b0;
-            REG_WRITE_SELECT = 1'b0;
+            REGSOURCE_SELECT = 1'b0;
         end   
         8'b00000110: // j 
         begin
@@ -294,7 +294,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             JUMP_SELECT = 1'b1;  
             DATAMEMORY_READ = 1'b0;
             DATAMEMORY_WRITE = 1'b0;
-            REG_WRITE_SELECT = 1'b0;
+            REGSOURCE_SELECT = 1'b0;
         end  
         8'b00000111: // beq
         begin
@@ -307,7 +307,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             JUMP_SELECT = 1'b0;  
             DATAMEMORY_READ = 1'b0;
             DATAMEMORY_WRITE = 1'b0;
-            REG_WRITE_SELECT = 1'b0;
+            REGSOURCE_SELECT = 1'b0;
         end 
         8'b00001000: // mult
         begin
@@ -320,7 +320,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             JUMP_SELECT = 1'b0;  
             DATAMEMORY_READ = 1'b0;
             DATAMEMORY_WRITE = 1'b0;
-            REG_WRITE_SELECT = 1'b0;
+            REGSOURCE_SELECT = 1'b0;
         end
         8'b00001001: // shift logically
         begin
@@ -333,7 +333,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             JUMP_SELECT = 1'b0;  
             DATAMEMORY_READ = 1'b0;
             DATAMEMORY_WRITE = 1'b0;
-            REG_WRITE_SELECT = 1'b0;
+            REGSOURCE_SELECT = 1'b0;
         end
         8'b00001010: // shift arithmaticaly
         begin
@@ -346,7 +346,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             JUMP_SELECT = 1'b0;  
             DATAMEMORY_READ = 1'b0;
             DATAMEMORY_WRITE = 1'b0;
-            REG_WRITE_SELECT = 1'b0;
+            REGSOURCE_SELECT = 1'b0;
         end
         8'b00001011: // rotate
         begin
@@ -359,7 +359,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             JUMP_SELECT = 1'b0;  
             DATAMEMORY_READ = 1'b0;
             DATAMEMORY_WRITE = 1'b0;
-            REG_WRITE_SELECT = 1'b0;
+            REGSOURCE_SELECT = 1'b0;
         end
         8'b00001100: // bne (branch if not equal)
         begin
@@ -372,7 +372,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             JUMP_SELECT = 1'b0;  
             DATAMEMORY_READ = 1'b0;
             DATAMEMORY_WRITE = 1'b0;
-            REG_WRITE_SELECT = 1'b0;
+            REGSOURCE_SELECT = 1'b0;
         end
         default:
         begin
@@ -384,7 +384,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             JUMP_SELECT = 1'b0; 
             DATAMEMORY_READ = 1'b0;
             DATAMEMORY_WRITE = 1'b0;
-            REG_WRITE_SELECT = 1'b0;
+            REGSOURCE_SELECT = 1'b0;
         end
         endcase
     end 
@@ -449,7 +449,7 @@ module cpu(PCOUT, INSTRUCTION, CLK, RESET);
     wire JUMP_SELECT;
     wire DATAMEMORY_READ;
     wire DATAMEMORY_WRITE;
-    wire REG_WRITE_SELECT;
+    wire REGSOURCE_SELECT;
 
     //register_file
     wire [`REG_SIZE-1:0] REGOUT2;
@@ -485,9 +485,9 @@ module cpu(PCOUT, INSTRUCTION, CLK, RESET);
     left_shift left_shift_for_branch(SIGNEXTENDEDBRANCH,LEFTSHIFTEDBRANCH); // left shift for branch iimidiate value
     branch_add branch_add(NEXTPCOUT,LEFTSHIFTEDBRANCH,BRANCHADDRESS);    // adding address to PC+4 for branch instruction
 
-    control_unit control_unit(OPCODE,ALUOP,IMMIDIATE_SELECT,WRITEENABLE,TWOS_COMP_SELECT,BRANCH_EQ_SELECT,BRANCH_NE_SELECT,JUMP_SELECT,BUSYWAIT,DATAMEMORY_READ,DATAMEMORY_WRITE,REG_WRITE_SELECT);  // Control unit
+    control_unit control_unit(OPCODE,ALUOP,IMMIDIATE_SELECT,WRITEENABLE,TWOS_COMP_SELECT,BRANCH_EQ_SELECT,BRANCH_NE_SELECT,JUMP_SELECT,BUSYWAIT,DATAMEMORY_READ,DATAMEMORY_WRITE,REGSOURCE_SELECT);  // Control unit
 
-    mux_module8 reg_write_mux(ALURESULT,MEMORY_DATA_READ,REGSOURCE_SELECTED,REG_WRITE_SELECT); // mux to select register writing source
+    mux_module8 reg_write_mux(ALURESULT,MEMORY_DATA_READ,REGSOURCE_SELECTED,REGSOURCE_SELECT); // mux to select register writing source
 
     reg_file reg_file(REGSOURCE_SELECTED,REGOUT1,REGOUT2,WRITEREG,READREG1,READREG2,WRITEENABLE,CLK,RESET);  // Register file
     twos_complement twoscomp(REGOUT2,TWOS_COMP);    // Twos complement 
