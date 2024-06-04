@@ -480,13 +480,13 @@ module alu (DATA1,DATA2,RESULT,SELECT,ZERO);
         3'b011: // or
             #1 RESULT = OR_RESULT;
         3'b100: // mult
-            #2 RESULT = MULT_RESULT;
+            #3 RESULT = MULT_RESULT;
         3'b101: // sl (logical shift)
             #2 RESULT = SL_RESULT;
         3'b110: // sa (arithmatic shift)
             #2 RESULT = SA_RESULT;
         3'b111: // ro (rotate)
-            #3 RESULT = RO_RESULT;
+            #2 RESULT = RO_RESULT;
         //default: 3'b1xx is reserved        
         
         endcase
