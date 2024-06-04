@@ -116,7 +116,7 @@ module mult_module (DATA1, DATA2, RESULT);
 	full_adder_module FA6_0(sum5, DATA2[7] & DATA1[0], 1'b0, OUT[7], );
 	
 	//Sending out result after #3 time unit delay
-	assign #3 RESULT = OUT;
+	assign RESULT = OUT;
 
 endmodule
 
