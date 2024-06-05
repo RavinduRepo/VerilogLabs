@@ -79,6 +79,10 @@ int main( int argc, char *argv[] )
 	char *op_ror 	= "00001011"; // rotate right
 	char *op_rol 	= "00001011"; // rotate left
 	char *op_bne	= "00001100"; // branch if not equal
+	char *op_lwd	= "00001101"; // load word 
+	char *op_lwi	= "00001110"; // load word immidiate
+	char *op_swd	= "00001111"; // store word
+	char *op_swi	= "00010000"; // store word immidiate
 
 
 
@@ -204,6 +208,10 @@ int main( int argc, char *argv[] )
 				is_right = 1;
 			}
 			else if(strcasecmp(in_token,"bne")==0) strcpy(out_token, op_bne);
+			else if(strcasecmp(in_token,"lwd")==0) strcpy(out_token, op_lwd);
+			else if(strcasecmp(in_token,"lwi")==0) strcpy(out_token, op_lwi);
+			else if(strcasecmp(in_token,"swd")==0) strcpy(out_token, op_swd);
+			else if(strcasecmp(in_token,"swi")==0) strcpy(out_token, op_swi);
 
 
 

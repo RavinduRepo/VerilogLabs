@@ -68,15 +68,19 @@ module twos_complement(DATA,RESULT);
 endmodule
 
 // Programme counter module
-module programme_counter(PCOUT,NEXTPCOUT,RESET,CLK,SELECTEDOUTPUT);
+module programme_counter(HOLD,PCOUT,NEXTPCOUT,RESET,CLK,SELECTEDOUTPUT);
     output reg [31:0] PCOUT; 
     output reg [31:0] NEXTPCOUT; 
     input [31:0] SELECTEDOUTPUT;
     input RESET;
     input CLK;
+    input HOLD;
 
     always @(posedge CLK) begin
-        if (RESET) begin // Sets to zero of resset is  high
+        if (HOLD) begin
+            PCOUT <= #1 PCOUT;
+        end
+        else if (RESET) begin // Sets to zero of resset is  high
             PCOUT <= #1 32'b0000_0000_0000_0000_0000_0000;
             NEXTPCOUT <= #2 32'b0000_0000_0000_0000_0000_0100;
         end
@@ -193,10 +197,10 @@ endmodule
 
 // add, sub, and, or, mov, loadi
 module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SELECT,BRANCH_NE_SELECT,JUMP_SELECT,
-                    BUSYWAIT,DATAMEMORY_READ,DATAMEMORY_WRITE,REGSOURCE_SELECT);
+                    BUSYWAIT,DATAMEMORY_READ,DATAMEMORY_WRITE,REGSOURCE_SELECT,HOLD);
     input [`OPCODE_SIZE-1:0] OPCODE;
     input BUSYWAIT;
-    output reg IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SELECT,BRANCH_NE_SELECT,JUMP_SELECT,DATAMEMORY_READ,DATAMEMORY_WRITE,REGSOURCE_SELECT;
+    output reg IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SELECT,BRANCH_NE_SELECT,JUMP_SELECT,DATAMEMORY_READ,DATAMEMORY_WRITE,REGSOURCE_SELECT,HOLD;
     output reg [`ALU_OP_SIZE-1:0] ALU_OP;
 
 
@@ -204,6 +208,8 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
     always @(*)
     begin
         #1 // Decorder delay
+        HOLD = BUSYWAIT; // Holding the Programme counter to the current command
+
         case (OPCODE) 
         8'b00000000: // loadi
         begin
@@ -374,6 +380,58 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
             DATAMEMORY_WRITE = 1'b0;
             REGSOURCE_SELECT = 1'b0;
         end
+        8'b00001101: // lwd (address from register)
+        begin
+            ALU_OP = 3'b000; //ALUOP COMMAND
+            TWOS_COMP = 1'b0;
+            IMMIDIATE_SELECT = 1'b0;
+            REG_WRITE = 1'b1; 
+            BRANCH_SELECT = 1'b0;
+            BRANCH_NE_SELECT = 1'b0;
+            JUMP_SELECT = 1'b0;  
+            DATAMEMORY_READ = 1'b1;
+            DATAMEMORY_WRITE = 1'b0;
+            REGSOURCE_SELECT = 1'b1;
+        end
+        8'b00001110: // lwi (address from immidiate val)
+        begin
+            ALU_OP = 3'b000; //ALUOP COMMAND
+            TWOS_COMP = 1'b0;
+            IMMIDIATE_SELECT = 1'b1;
+            REG_WRITE = 1'b1; 
+            BRANCH_SELECT = 1'b0;
+            BRANCH_NE_SELECT = 1'b0;
+            JUMP_SELECT = 1'b0;  
+            DATAMEMORY_READ = 1'b1;
+            DATAMEMORY_WRITE = 1'b0;
+            REGSOURCE_SELECT = 1'b1;
+        end
+        8'b00001111: // swd (address from register)
+        begin
+            ALU_OP = 3'b000; //ALUOP COMMAND
+            TWOS_COMP = 1'b0;
+            IMMIDIATE_SELECT = 1'b0;
+            REG_WRITE = 1'b0; 
+            BRANCH_SELECT = 1'b0;
+            BRANCH_NE_SELECT = 1'b0;
+            JUMP_SELECT = 1'b0;  
+            DATAMEMORY_READ = 1'b0;
+            DATAMEMORY_WRITE = 1'b1;
+            REGSOURCE_SELECT = 1'b0;
+        end
+        8'b00010000: // swi (address from immidiate val)
+        begin
+            ALU_OP = 3'b000; //ALUOP COMMAND
+            TWOS_COMP = 1'b0;
+            IMMIDIATE_SELECT = 1'b1;
+            REG_WRITE = 1'b0; 
+            BRANCH_SELECT = 1'b0;
+            BRANCH_NE_SELECT = 1'b0;
+            JUMP_SELECT = 1'b0;  
+            DATAMEMORY_READ = 1'b0;
+            DATAMEMORY_WRITE = 1'b1;
+            REGSOURCE_SELECT = 1'b0;
+        end
         default:
         begin
             ALU_OP = 3'b000; //ALUOP COMMAND
@@ -391,8 +449,7 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
 
 endmodule
 
-	// char *op_j		= "00000110";
-	// char *op_beq	= "00000111";
+
 
 module cpu(PCOUT, INSTRUCTION, CLK, RESET);
     input wire [31:0] INSTRUCTION;
@@ -450,6 +507,7 @@ module cpu(PCOUT, INSTRUCTION, CLK, RESET);
     wire DATAMEMORY_READ;
     wire DATAMEMORY_WRITE;
     wire REGSOURCE_SELECT;
+    wire HOLD;
 
     //register_file
     wire [`REG_SIZE-1:0] REGOUT2;
@@ -474,7 +532,7 @@ module cpu(PCOUT, INSTRUCTION, CLK, RESET);
     wire [`REG_SIZE-1:0] MEMORY_DATA_READ;
 
 
-    programme_counter pc(PCOUT,NEXTPCOUT,RESET,CLK,JUMP_SELECTED); // The programme counter
+    programme_counter pc(HOLD,PCOUT,NEXTPCOUT,RESET,CLK,JUMP_SELECTED); // The programme counter
     instruction_decoder instruction_decoder(INSTRUCTION,OPCODE,READREG1,READREG2,WRITEREG,IMMIDIATE,BRANCHINSTRUCTION,JUMPINSTRUCTION);   // The instruction decorder
     
     sign_extender sign_extender_for_jump(JUMPINSTRUCTION,SIGNEXTENDEDJUMP);     // sign extend for jump instruction
@@ -485,7 +543,7 @@ module cpu(PCOUT, INSTRUCTION, CLK, RESET);
     left_shift left_shift_for_branch(SIGNEXTENDEDBRANCH,LEFTSHIFTEDBRANCH); // left shift for branch iimidiate value
     branch_add branch_add(NEXTPCOUT,LEFTSHIFTEDBRANCH,BRANCHADDRESS);    // adding address to PC+4 for branch instruction
 
-    control_unit control_unit(OPCODE,ALUOP,IMMIDIATE_SELECT,WRITEENABLE,TWOS_COMP_SELECT,BRANCH_EQ_SELECT,BRANCH_NE_SELECT,JUMP_SELECT,BUSYWAIT,DATAMEMORY_READ,DATAMEMORY_WRITE,REGSOURCE_SELECT);  // Control unit
+    control_unit control_unit(OPCODE,ALUOP,IMMIDIATE_SELECT,WRITEENABLE,TWOS_COMP_SELECT,BRANCH_EQ_SELECT,BRANCH_NE_SELECT,JUMP_SELECT,BUSYWAIT,DATAMEMORY_READ,DATAMEMORY_WRITE,REGSOURCE_SELECT,HOLD);  // Control unit
 
     mux_module8 reg_write_mux(ALURESULT,MEMORY_DATA_READ,REGSOURCE_SELECTED,REGSOURCE_SELECT); // mux to select register writing source
 
