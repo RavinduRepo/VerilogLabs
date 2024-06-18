@@ -79,4 +79,9 @@ begin
     end
 end
 
+initial begin
+    $dumpfile("cpu_wavedata.vcd");
+    for (i=0;i<256;i++)
+        $dumpvars(1,memory_array[i]);
+end
 endmodule
