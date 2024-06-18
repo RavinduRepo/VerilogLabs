@@ -1,6 +1,8 @@
 `include "alu.v"
 `include "reg_file.v"
 `include "data_memory.v"
+`include "dcache.v"
+
 
 
 // Variables defined if have to change later(No effect when synthesising since all replace by it's value)
@@ -527,10 +529,17 @@ module cpu(PCOUT, INSTRUCTION, CLK, RESET);
     wire [`REG_SIZE-1:0] ALURESULT;
     wire ZERO;
 
-    //data_memory
+    //cache_memory
     wire BUSYWAIT;
     wire [`REG_SIZE-1:0] MEMORY_DATA_READ;
 
+    //data_memory
+    wire mem_read;
+    wire mem_write;
+    wire [5:0] mem_address;
+    wire [31:0] mem_writedata;
+    wire [31:0] mem_readdata;
+    wire mem_busywait;
 
     programme_counter pc(HOLD,PCOUT,NEXTPCOUT,RESET,CLK,JUMP_SELECTED); // The programme counter
     instruction_decoder instruction_decoder(INSTRUCTION,OPCODE,READREG1,READREG2,WRITEREG,IMMIDIATE,BRANCHINSTRUCTION,JUMPINSTRUCTION);   // The instruction decorder
@@ -564,6 +573,8 @@ module cpu(PCOUT, INSTRUCTION, CLK, RESET);
 
     alu alu(REGOUT1,IMMIDIATE_SELECTED,ALURESULT,ALUOP,ZERO);    // The ALU 
 
-    data_memory data_memory(CLK,RESET,DATAMEMORY_READ,DATAMEMORY_WRITE,ALURESULT,REGOUT1,MEMORY_DATA_READ,BUSYWAIT); // The data memory
+    dcache cache_memory(CLK,RESET,DATAMEMORY_READ,DATAMEMORY_WRITE,ALURESULT,REGOUT1,MEMORY_DATA_READ,BUSYWAIT,mem_read,mem_write,mem_address,mem_writedata,mem_readdata,mem_busywait); // The cache memory
+
+    data_memory data_memory(CLK,RESET,mem_read,mem_write,mem_address,mem_writedata,mem_readdata,mem_busywait); // The data memory
 
 endmodule

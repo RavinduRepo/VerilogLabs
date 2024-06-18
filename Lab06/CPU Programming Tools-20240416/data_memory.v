@@ -64,8 +64,10 @@ begin
 end
 
 //Reset memory
+integer i;
 always @(posedge reset)
 begin
+	
     if (reset)
     begin
         for (i=0;i<256; i=i+1)
