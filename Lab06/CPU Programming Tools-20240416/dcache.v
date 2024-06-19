@@ -84,7 +84,7 @@ module dcache (
     always @(posedge clock) begin
         if (hit) begin
             cpu_busywait = 0; // de-assert to prevent cpu stalking 
-            if (cpu_read && !cpu_read) begin // If read
+            if (cpu_read && !cpu_write) begin // If read
                 cache_write = 0; // Stop writing if read signal
             end
             else if (cpu_write && !cpu_read) begin // If write

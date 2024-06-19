@@ -1,7 +1,7 @@
 loadi 0 0x09 // r0 = 9
 loadi 1 0x01 // r1 = 1
 swd 0 1 // m1 = r0 = 9
-swi 1 0x00 // r1 = 0
+swi 1 0x00 // m0 = r1 = 1
 lwd 2 1 // r2 = m1 = 9
 lwd 3 1 // r3 = m1 = 9
 sub 4 0 1 // r4 = r0 - r1 = 8
