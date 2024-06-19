@@ -47,9 +47,9 @@ module dcache (
 
     // Cache Data Structure
     reg [31:0] cacheblock_array [7:0];  // block array (32 bit * 8)
-    reg dirty_array [7:0];              // dirty bit array (1 bit * 8)
-    reg valid_array [7:0];              // valid bit array (1 bit * 8)
-    reg [2:0] tagArray [7:0];           // tag array (3 bit * 8)
+    reg dirty_array [7:0];              // dirty bit array (1 bit * 8) for each block
+    reg valid_array [7:0];              // valid bit array (1 bit * 8) for each block
+    reg [2:0] tagArray [7:0];           // tag array (3 bit * 8) for each block
     reg cache_write;                    // signal for write in cache
 
 
