@@ -12,8 +12,8 @@ module icache (PC, INSTRUCTION, clock, reset, cpu_busywait, inst_busywait, read,
     output reg [5:0] address;
     output reg read;
 
-    wire hit;                          // wire for hit/miss
-    wire [2:0] tag, index;             // wire tag (from cpu address) , index (from cpu address)
+    wire hit;                          // hit/miss signal
+    wire [2:0] tag, index;             // tag(from cpu address) , index(from cpu address)
     wire [3:0] offset;                 // offset from the cpu address
     reg tagmatch;                      // reg for storing tag comparison result
 
@@ -124,21 +124,21 @@ module icache (PC, INSTRUCTION, clock, reset, cpu_busywait, inst_busywait, read,
     //testing - dump the values of the memory array to the gtkwave file
     initial
     begin
-        $dumpfile("cpu_wavedata1.vcd");
+        $dumpfile("cpu_wavedata.vcd");
         for(i = 0;i<8;i++)
             $dumpvars(1,cacheblock_array[i]);
     end
 
     initial
     begin
-        $dumpfile("cpu_wavedata1.vcd");
+        $dumpfile("cpu_wavedata.vcd");
         for(i = 0;i<8;i++)
             $dumpvars(1,tagArray[i]);
     end
 
     initial
     begin
-        $dumpfile("cpu_wavedata1.vcd");
+        $dumpfile("cpu_wavedata.vcd");
         for(i = 0;i<8;i++)
             $dumpvars(1,valid_array[i]);
     end
