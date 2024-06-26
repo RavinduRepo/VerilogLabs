@@ -3,23 +3,29 @@
 // Author: Isuru Nawinne
 
 `include "cpu.v"
+`include "icache.v"
+`include "instruction_memory.v"
+
 
 module cpu_tb;
 
     reg CLK, RESET;
     wire [31:0] PC;
     wire [31:0] INSTRUCTION;
-
+    wire inst_busywait, cpu_busywait;
+    wire read;
+    wire [127:0] readinst;
+    wire [5:0] address;
     
     // TODO: Initialize an array of registers (8x1024) named 'instr_mem' to be used as instruction memory
-    reg [7:0] instr_mem [1023:0];
+    // reg [7:0] instr_mem [1023:0];
     
     // TODO: Create combinational logic to support CPU instruction fetching, given the Program Counter(PC) value 
     //       (make sure you include the delay for instruction fetching here)
-    assign INSTRUCTION = {instr_mem[PC+3], instr_mem[PC+2], instr_mem[PC+1], instr_mem[PC]};
+    // assign INSTRUCTION = {instr_mem[PC+3], instr_mem[PC+2], instr_mem[PC+1], instr_mem[PC]};
     
-    initial
-    begin
+    // initial
+    // begin
         // Initialize instruction memory with the set of instructions you need execute on CPU
         
         // METHOD 1: manually loading instructions to instr_mem
@@ -28,15 +34,18 @@ module cpu_tb;
         // {instr_mem[10'd11], instr_mem[10'd10], instr_mem[10'd9], instr_mem[10'd8]} = 32'b00000010000001100000010000000010;
         
         // METHOD 2: loading instr_mem content from instr_mem.mem file
-        $readmemb("instr_mem.mem", instr_mem,0,1023);
-    end
+        // $readmemb("instr_mem.mem", instr_mem,0,1023);
+    // end
     
     /* 
     -----
      CPU
     -----
     */
-    cpu mycpu(PC, INSTRUCTION, CLK, RESET);
+    cpu mycpu(PC, INSTRUCTION, CLK, RESET, cpu_busywait);
+    icache icache(PC, INSTRUCTION, CLK, RESET, cpu_busywait, inst_busywait, read, readinst, address);
+    instruction_memory instruction_memory(CLK, read, address, readinst, inst_busywait);
+
     
     integer i;
     initial
@@ -58,7 +67,7 @@ module cpu_tb;
         RESET = 1'b0;
         
         // finish simulation after some time
-        #700
+        #3000
         $finish;
         
     end
