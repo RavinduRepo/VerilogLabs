@@ -209,8 +209,8 @@ module control_unit(OPCODE,ALU_OP,IMMIDIATE_SELECT,REG_WRITE,TWOS_COMP,BRANCH_SE
     // always block * to run the block whenever any input changes  
     always @(*)
     begin
-        #1 // Decorder delay
         HOLD = BUSYWAIT; // Holding the Programme counter to the current command
+        #1 // Decorder delay
 
         case (OPCODE) 
         8'b00000000: // loadi

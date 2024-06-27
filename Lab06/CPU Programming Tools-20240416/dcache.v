@@ -59,7 +59,7 @@ module dcache (
     assign #1 offset = cpu_address[1:0]; 
 
     // Set busywait bit to high if write or read signal given
-    always @(cpu_read, cpu_write) begin
+    always @(*) begin
         cpu_busywait = (cpu_read || cpu_write) ? 1 : 0;
         if(cpu_write == 1)begin
             cache_write = 1;
@@ -78,7 +78,7 @@ module dcache (
     end
 
     // Check if a hit or miss
-    assign hit = tagmatch & valid_array[index];
+    assign hit = tagmatch && valid_array[index];
 
     // If hit, handle read write de-assert busywait
     always @(posedge clock) begin
