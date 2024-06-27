@@ -1,48 +1,43 @@
-module icache (PC, INSTRUCTION, clock, reset, cpu_busywait, inst_busywait, read, readinst, address);
-    input clock, reset;
+module icache (
+    input [31:0] PC,            // Program Counter from CPU
+    output reg [31:0] INSTRUCTION, // Instruction output to CPU
+    input clock,                // Clock signal
+    input reset,                // Reset signal
+    output reg cpu_busywait,    // CPU busywait signal
+    input inst_busywait,        // Instruction memory busywait signal
+    output reg read,            // Read signal for instruction memory
+    input [127:0] readinst,     // Data read from instruction memory
+    output reg [5:0] address    // Address output to instruction memory
+);
 
-    // CPU
-    input [31:0] PC;
-    output reg cpu_busywait;
-    output reg [31:0] INSTRUCTION;
+    // Signals for cache hit/miss detection
+    wire hit;
+    wire [2:0] tag, index;
+    wire [3:0] offset;
+    reg tagmatch;
 
-    // Instruction memory
-    input [127:0] readinst; // block of instr_mem
-    input inst_busywait; // 
-    output reg [5:0] address;
-    output reg read;
+    // Cache data structure
+    reg [127:0] cacheblock_array [7:0];  // 8 cache blocks, each 128 bits
+    reg valid_array [7:0];               // Valid bits for each cache block
+    reg [2:0] tagArray [7:0];            // Tag array for each cache block
 
-    wire hit;                          // hit/miss signal
-    wire [2:0] tag, index;             // tag(from cpu address) , index(from cpu address)
-    wire [3:0] offset;                 // offset from the cpu address
-    reg tagmatch;                      // reg for storing tag comparison result
-
-    // Cache Data Structure
-    reg [127:0] cacheblock_array [7:0];  // block array (128 bit * 8)
-    reg valid_array [7:0];              // valid bit array (1 bit * 8)
-    reg [2:0] tagArray [7:0];           // tag array (3 bit * 8)
-
-    // separating the address into tag, index, and offset
+    // Separate the address into tag, index, and offset
     assign #1 tag = PC[9:7];
     assign #1 index = PC[6:4];
     assign #1 offset = PC[3:0];
 
-    // do the tag comparison and generate the hit signal using valid bit
-    always @(index,tagArray[index],tag) begin
+    // Tag comparison and hit signal generation
+    always @(index, tagArray[index], tag) begin
         #0.9
-        if(tag == tagArray[index]) begin
-            tagmatch = 1;
-        end
-        else begin
-            tagmatch = 0;
-        end
+        tagmatch = (tag == tagArray[index]) ? 1 : 0;
     end
+
     assign hit = tagmatch & valid_array[index];
 
-    // Create combinational logic to support CPU instruction fetching, given the Program Counter(PC) value 
+    // Combinational logic for CPU instruction fetching
     always @(*) begin
-        if(hit) begin
-            case(offset)
+        if (hit) begin
+            case (offset)
                 4'b0000: INSTRUCTION = cacheblock_array[index][31:0];
                 4'b0100: INSTRUCTION = cacheblock_array[index][63:32];
                 4'b1000: INSTRUCTION = cacheblock_array[index][95:64];
@@ -51,20 +46,12 @@ module icache (PC, INSTRUCTION, clock, reset, cpu_busywait, inst_busywait, read,
         end
     end
 
+    // CPU busywait signal control
     always @(*) begin
-        if(hit) begin
-          cpu_busywait = 0;
-          //read = 0;
-        end
-        else begin
-            cpu_busywait = 1;
-            //read = 1;
-        end
+        cpu_busywait = hit ? 0 : 1;
     end
 
-
     /* Cache Controller FSM Start */
-
     parameter IDLE = 3'b000, MEM_READ = 3'b001;
     reg [2:0] state, next_state;
 
@@ -72,16 +59,9 @@ module icache (PC, INSTRUCTION, clock, reset, cpu_busywait, inst_busywait, read,
     always @(*) begin
         case (state)
             IDLE:
-                if (!hit)  
-                    next_state = MEM_READ; // Move to MEM_READ state if there's no hit
-                else
-                    next_state = IDLE; // Remain in IDLE state otherwise
-            
+                next_state = hit ? IDLE : MEM_READ; // Transition to MEM_READ if no hit
             MEM_READ:
-                if (!inst_busywait)
-                    next_state = IDLE; // Move to IDLE state after memory read completes
-                else    
-                    next_state = MEM_READ; // Remain in MEM_READ state if memory is still busy
+                next_state = inst_busywait ? MEM_READ : IDLE; // Stay in MEM_READ if memory is busy
         endcase
     end
 
@@ -90,19 +70,17 @@ module icache (PC, INSTRUCTION, clock, reset, cpu_busywait, inst_busywait, read,
         case(state)
             IDLE: begin
                 read = 0;
-                address = 10'dx;
+                address = 6'dx; // Don't care address
                 cpu_busywait = 0;
             end
-         
             MEM_READ: begin
                 read = 1;
-                address = {tag, index};
+                address = {tag, index}; // Set address for memory read
                 cpu_busywait = 1;
-
-                #1 if(inst_busywait == 0) begin
+                #1 if (inst_busywait == 0) begin
                     cacheblock_array[index] = readinst; // Load data from memory to cache
-                    valid_array[index] = 1; // Mark the cache block as valid
-                    tagArray[index] = tag; // Update the tag for the cache block
+                    valid_array[index] = 1; // Mark cache block as valid
+                    tagArray[index] = tag; // Update cache block tag
                 end
             end
         endcase
@@ -110,10 +88,10 @@ module icache (PC, INSTRUCTION, clock, reset, cpu_busywait, inst_busywait, read,
 
     integer i;
     // Sequential logic for state transitioning and cache initialization
-    always @(posedge clock, reset) begin
-        if(reset) begin
+    always @(posedge clock or posedge reset) begin
+        if (reset) begin
             state = IDLE; // Initialize state to IDLE
-            for(i = 0; i < 8; i = i + 1) begin
+            for (i = 0; i < 8; i = i + 1) begin
                 valid_array[i] = 0; // Initialize all valid bits to 0
             end
         end else begin
@@ -121,26 +99,14 @@ module icache (PC, INSTRUCTION, clock, reset, cpu_busywait, inst_busywait, read,
         end
     end
 
-    //testing - dump the values of the memory array to the gtkwave file
-    initial
-    begin
+    // Dump values of the memory array to the gtkwave file for testing
+    initial begin
         $dumpfile("cpu_wavedata.vcd");
-        for(i = 0;i<8;i++)
-            $dumpvars(1,cacheblock_array[i]);
-    end
-
-    initial
-    begin
-        $dumpfile("cpu_wavedata.vcd");
-        for(i = 0;i<8;i++)
-            $dumpvars(1,tagArray[i]);
-    end
-
-    initial
-    begin
-        $dumpfile("cpu_wavedata.vcd");
-        for(i = 0;i<8;i++)
-            $dumpvars(1,valid_array[i]);
+        for (i = 0; i < 8; i = i + 1) begin
+            $dumpvars(1, cacheblock_array[i]);
+            $dumpvars(1, tagArray[i]);
+            $dumpvars(1, valid_array[i]);
+        end
     end
 
 endmodule
