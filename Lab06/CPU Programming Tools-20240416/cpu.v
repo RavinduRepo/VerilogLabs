@@ -79,17 +79,18 @@ module programme_counter(HOLD,PCOUT,NEXTPCOUT,RESET,CLK,SELECTEDOUTPUT);
     input HOLD;
 
     always @(posedge CLK) begin
+        #1
         if (HOLD) begin
-            PCOUT <= #1 PCOUT;
+            PCOUT = PCOUT;
         end
         else if (RESET) begin // Sets to zero of resset is  high
-            PCOUT <= #1 32'b0000_0000_0000_0000_0000_0000;
-            NEXTPCOUT <= #2 32'b0000_0000_0000_0000_0000_0100;
+            PCOUT = 32'b0000_0000_0000_0000_0000_0000;
+            NEXTPCOUT = #1 32'b0000_0000_0000_0000_0000_0100;
         end
 
         else begin // incrementing
-            PCOUT <= #1 SELECTEDOUTPUT;
-            NEXTPCOUT <= #2 SELECTEDOUTPUT + 32'd4;
+            PCOUT = SELECTEDOUTPUT;
+            NEXTPCOUT = #1 SELECTEDOUTPUT + 32'd4;
         end
     end
     
